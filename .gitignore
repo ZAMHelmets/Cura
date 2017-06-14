@@ -42,6 +42,7 @@ plugins/FlatProfileExporter
 plugins/ProfileFlattener
 plugins/cura-god-mode-plugin
 plugins/cura-big-flame-graph
+plugins/uranium
 
 #Build stuff
 CMakeCache.txt
@@ -58,3 +59,4 @@ cmake_install.cmake
 *.gcode
 run.sh
 
+CuraEngine

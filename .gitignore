@@ -55,3 +55,4 @@ cmake_install.cmake
 *.gcode
 run.sh
 
+CuraEngine

@@ -2966,6 +2966,17 @@
                     "enabled": "retraction_hop_enabled and machine_extruder_count > 1",
                     "settable_per_mesh": false,
                     "settable_per_extruder": true
+                },
+                "retraction_hop_distance": {
+                    "label": "Z Hop Distance",
+                    "description": "Distance to lift Z when changing toolheads.",
+                    "unit": "mm",
+                    "type": "float",
+                    "default_value": 2,
+                    "minimum_value": "0",
+                    "minimum_value_warning": "0",
+                    "maximum_value_warning": "5",
+                    "enabled": "fix_tool_change_retraction_hop and retraction_hop_after_extruder_switch"
                 }
             }
         },
@@ -4565,6 +4576,39 @@
                     "maximum_value_warning": "20",
                     "settable_per_mesh": false,
                     "settable_per_extruder": false
+                },
+                "smart_purge": {
+                    "label": "Smart Purge",
+                    "description": "Add an extra prime amount to compensate oozed material while the Extruder was idle. Disable Prime tower to save time and filament.",
+                    "type": "bool",
+                    "default_value": true,
+                    "enabled": false
+                },
+                "minimum_extrusion":
+                {
+                    "label": "Minimum Extrusion",
+                    "description": "Minimum filament length to be extruded in the layer to avoid purge.",
+                    "unit": "mm",
+                    "type": "float",
+                    "default_value": 1.5,
+                    "minimum_value": "0",
+                    "minimum_value_warning": "0",
+                    "maximum_value_warning": "50",
+                    "enabled": "smart_purge",
+                    "settable_per_extruder": true
+                },
+                "purge_length":
+                {
+                    "label": "Purge Length",
+                    "description": "Purged distance when purge is needed.",
+                    "unit": "mm",
+                    "type": "float",
+                    "default_value": 1.5,
+                    "minimum_value": "0",
+                    "minimum_value_warning": "0",
+                    "maximum_value_warning": "50",
+                    "enabled": "smart_purge",
+                    "settable_per_extruder": true
                 }
             }
         },
@@ -5574,6 +5618,13 @@
                     "enabled": "ironing_enabled",
                     "limit_to_extruder": "top_bottom_extruder_nr",
                     "settable_per_mesh": true
+                },
+                "retract_reduction": {
+                    "label": "Reduce Retraction",
+                    "description": "Retract only on outer walls and top/bottom layers.",
+                    "type": "bool",
+                    "default_value": false,
+                    "enabled": true
                 }
             }
         },
@@ -5616,6 +5667,49 @@
                     "description": "Transformation matrix to be applied to the model when loading it from file.",
                     "type": "str",
                     "default_value": "[[1,0,0], [0,1,0], [0,0,1]]",
+                    "enabled": false
+                }
+            }
+        },
+        "bcn3d_technologies_fixes": {
+            "label": "Bcn3d technologies fixes",
+            "description": "fixes to apply in post processing",
+            "type": "category",
+            "enabled": false,
+            "children": {
+                "auto_apply_fixes": {
+                    "label": "Auto apply fixes",
+                    "description": "apply bcn3dtechnologies_fixes if true",
+                    "type": "bool",
+                    "default_value": true,
+                    "enabled": false
+                },
+                "active_extruders": {
+                    "label": "Heat only essentials",
+                    "description": "When printing with one hotend only, avoid heating the other one.",
+                    "type": "bool",
+                    "default_value": "True and autoApplyFixes",
+                    "enabled": false
+                },
+                "fix_first_retract": {
+                    "label": "Fix First Extrusion",
+                    "description": "Avoid zeroing extruders at the beginning.",
+                    "type": "bool",
+                    "default_value": "True and autoApplyFixes",
+                    "enabled": false
+                },
+                "fix_temperature_oscilation": {
+                    "label": "Fix Temperature Oscilation",
+                    "description": "Fix bad target temperatures when printing with both extruders.",
+                    "type": "bool",
+                    "default_value": "True and autoApplyFixes",
+                    "enabled": false
+                },
+                "fix_tool_change_retraction_hop": {
+                    "label": "Fix Tool Change Z Hop",
+                    "description": "When changing between toolheads, first move X/Y and then move Z.",
+                    "type": "bool",
+                    "default_value": "True and autoApplyFixes",
                     "enabled": false
                 }
             }

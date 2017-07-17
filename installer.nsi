@@ -1,5 +1,5 @@
 !ifndef VERSION
-  !define VERSION '15.09.80'
+  !define VERSION '2.6'
 !endif
 
 ; The name of the installer
@@ -62,7 +62,7 @@ SetCompressor /SOLID lzma
 
 ; Reserve Files
 !insertmacro MUI_RESERVEFILE_LANGDLL
-ReserveFile '${NSISDIR}\Plugins\InstallOptions.dll'
+ReserveFile '${NSISDIR}\Plugins\x86-unicode\InstallOptions.dll'
 
 ;--------------------------------
 
@@ -104,17 +104,17 @@ FunctionEnd
 
 Section "Install Visual Studio 2010 Redistributable"
     SetOutPath "$INSTDIR"
-    File "vcredist_2010_20110908_x86.exe"
+    File "..\cura-binary-data\windows\vcredist_x32.exe"
     
     IfSilent +2
-      ExecWait '"$INSTDIR\vcredist_2010_20110908_x86.exe" /q /norestart'
+      ExecWait '"$INSTDIR\vcredist_x32.exe" /q /norestart'
 
 SectionEnd
 
 Section "Install Arduino Drivers"
   ; Set output path to the driver directory.
   SetOutPath "$INSTDIR\drivers\"
-  File /r "drivers\"
+  File /r "..\cura-binary-data\windows\arduino\"
   
   ${If} ${RunningX64}
     IfSilent +2

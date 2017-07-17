@@ -15,6 +15,10 @@ LC_MESSAGES
 #MacOS
 .DS_Store
 
+#Windows
+Cura*.exe
+dist/
+
 # Editors and IDEs.
 *kdev*
 *.kate-swp
@@ -56,4 +60,4 @@ install_dir/
 *.gcode
 run.sh
 
-CuraEngine
+CuraEngine*

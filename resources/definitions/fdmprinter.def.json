@@ -5688,28 +5688,28 @@
                     "label": "Heat only essentials",
                     "description": "When printing with one hotend only, avoid heating the other one.",
                     "type": "bool",
-                    "default_value": "True and autoApplyFixes",
+                    "default_value": "auto_apply_fixes",
                     "enabled": false
                 },
                 "fix_first_retract": {
                     "label": "Fix First Extrusion",
                     "description": "Avoid zeroing extruders at the beginning.",
                     "type": "bool",
-                    "default_value": "True and autoApplyFixes",
+                    "default_value": "auto_apply_fixes",
                     "enabled": false
                 },
                 "fix_temperature_oscilation": {
                     "label": "Fix Temperature Oscilation",
                     "description": "Fix bad target temperatures when printing with both extruders.",
                     "type": "bool",
-                    "default_value": "True and autoApplyFixes",
+                    "default_value": "auto_apply_fixes",
                     "enabled": false
                 },
                 "fix_tool_change_retraction_hop": {
                     "label": "Fix Tool Change Z Hop",
                     "description": "When changing between toolheads, first move X/Y and then move Z.",
                     "type": "bool",
-                    "default_value": "True and autoApplyFixes",
+                    "default_value": "auto_apply_fixes",
                     "enabled": false
                 }
             }

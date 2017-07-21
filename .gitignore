@@ -60,4 +60,4 @@ install_dir/
 *.gcode
 run.sh
 
-CuraEngine*
+CuraEngine

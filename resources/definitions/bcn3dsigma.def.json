@@ -75,6 +75,8 @@
         "material_bed_temp_prepend": { "value": false },
         "material_print_temp_prepend": { "value": false },
         "smart_purge": { "enabled": true },
-        "retract_reduction": { "enabled": true }
+        "retract_reduction": { "enabled": true },
+        "avoid_grinding_filament": { "enabled": true },
+        "auto_apply_fixes": { "value": true }
     }
 }

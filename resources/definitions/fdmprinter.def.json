@@ -1834,6 +1834,27 @@
                     "settable_per_mesh": false,
                     "settable_per_extruder": true
                 },
+                "avoid_grinding_filament":
+                {
+                    "label": "Prevent Filament Grinding",
+                    "description": "When retracting repeatedly, this option moves the hotend to the purge tray and primes the needed amount of filament to allow working on a new piece of it. Disabling this feature can flatten the filament and cause grinding issues.",
+                    "type": "bool",
+                    "default_value": true,
+                    "enabled": false,
+                    "comments": "bcn3d setting"
+                },
+                "max_retract":
+                {
+                    "label": "Max. Retraction Count",
+                    "description": "For the Left Extruder: Number of retractions occurring within the retraction distance. When the number of retractions is reached, active extruder will park, prime and come back (stronger than ever ;)",
+                    "type": "int",
+                    "default_value": 50,
+                    "minimum_value": "0",
+                    "minimum_value_warning": "0",
+                    "maximum_value_warning": "90",
+                    "enabled": "avoid_grinding_filament",
+                    "comments": "bcn3d setting"
+                },
                 "retraction_extrusion_window":
                 {
                     "label": "Minimum Extrusion Distance Window",
@@ -2967,8 +2988,8 @@
                     "settable_per_mesh": false,
                     "settable_per_extruder": true
                 },
-                "retraction_hop_distance": {
-                    "label": "Z Hop Distance",
+                "retraction_hop_height_after_extruder_switch": {
+                    "label": "Z Hop Height After Extruder Switch",
                     "description": "Distance to lift Z when changing toolheads.",
                     "unit": "mm",
                     "type": "float",
@@ -2976,7 +2997,8 @@
                     "minimum_value": "0",
                     "minimum_value_warning": "0",
                     "maximum_value_warning": "5",
-                    "enabled": "fix_tool_change_retraction_hop and retraction_hop_after_extruder_switch"
+                    "enabled": "fix_tool_change_retraction_hop and retraction_hop_after_extruder_switch",
+                    "comments": "bcn3d setting"
                 }
             }
         },
@@ -4582,7 +4604,8 @@
                     "description": "Add an extra prime amount to compensate oozed material while the Extruder was idle. Disable Prime tower to save time and filament.",
                     "type": "bool",
                     "default_value": true,
-                    "enabled": false
+                    "enabled": false,
+                    "comments": "bcn3d setting"
                 },
                 "minimum_extrusion":
                 {
@@ -4595,7 +4618,8 @@
                     "minimum_value_warning": "0",
                     "maximum_value_warning": "50",
                     "enabled": "smart_purge",
-                    "settable_per_extruder": true
+                    "settable_per_extruder": true,
+                    "comments": "bcn3d setting"
                 },
                 "purge_length":
                 {
@@ -4608,7 +4632,8 @@
                     "minimum_value_warning": "0",
                     "maximum_value_warning": "50",
                     "enabled": "smart_purge",
-                    "settable_per_extruder": true
+                    "settable_per_extruder": true,
+                    "comments": "bcn3d setting"
                 }
             }
         },
@@ -5624,7 +5649,8 @@
                     "description": "Retract only on outer walls and top/bottom layers.",
                     "type": "bool",
                     "default_value": false,
-                    "enabled": true
+                    "enabled": true,
+                    "comments": "bcn3d setting"
                 }
             }
         },
@@ -5675,13 +5701,14 @@
             "label": "Bcn3d technologies fixes",
             "description": "fixes to apply in post processing",
             "type": "category",
+            "comments": "bcn3d settings",
             "enabled": false,
             "children": {
                 "auto_apply_fixes": {
                     "label": "Auto apply fixes",
                     "description": "apply bcn3dtechnologies_fixes if true",
                     "type": "bool",
-                    "default_value": true,
+                    "default_value": false,
                     "enabled": false
                 },
                 "active_extruders": {

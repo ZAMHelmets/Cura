@@ -316,6 +316,8 @@ class CuraApplication(QtApplication):
                 material_diameter
                 material_flow
                 retraction_enable
+                avoid_grinding_filament
+                max_retract
             speed
                 speed_print
                 speed_travel
@@ -324,6 +326,7 @@ class CuraApplication(QtApplication):
                 jerk_print
                 jerk_travel
             travel
+                retraction_hop_height_after_extruder_switch
             cooling
                 cool_fan_enabled
             support
@@ -342,12 +345,16 @@ class CuraApplication(QtApplication):
                 prime_tower_size
                 prime_tower_position_x
                 prime_tower_position_y
+                smart_purge
+                minimum_extrusion
+                purge_length
             meshfix
             blackmagic
                 print_sequence
                 infill_mesh
                 cutting_mesh
             experimental
+                retract_reduction
         """.replace("\n", ";").replace(" ", ""))
 
         self.applicationShuttingDown.connect(self.saveSettings)

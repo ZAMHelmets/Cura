@@ -77,6 +77,7 @@
         "smart_purge": { "enabled": true },
         "retract_reduction": { "enabled": true },
         "avoid_grinding_filament": { "enabled": true },
+        "print_mode": { "enabled": true },
         "auto_apply_fixes": { "value": true }
     }
 }

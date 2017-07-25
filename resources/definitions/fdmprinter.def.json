@@ -4606,6 +4606,7 @@
                     "type": "bool",
                     "default_value": true,
                     "enabled": false,
+                    "settable_per_extruder": false,
                     "comments": "bcn3d setting"
                 },
                 "minimum_extrusion":
@@ -4886,6 +4887,22 @@
                     "enabled": "magic_spiralize",
                     "settable_per_mesh": false,
                     "settable_per_extruder": false
+                },
+                "print_mode":
+                {
+                    "label": "Print Mode",
+                    "description": "Choose the print mode",
+                    "type": "enum",
+                    "options":
+                    {
+                        "regular": "Regular",
+                        "mirror": "Mirror",
+                        "duplication": "Duplication"
+                    },
+                    "default_value": "regular",
+                    "enabled": false,
+                    "settable_per_extruder": false,
+                    "comments": "bcn3d setting"
                 }
             }
         },
@@ -5716,28 +5733,32 @@
                     "label": "Heat only essentials",
                     "description": "When printing with one hotend only, avoid heating the other one.",
                     "type": "bool",
-                    "default_value": "auto_apply_fixes",
+                    "default_value": false,
+                    "value": "auto_apply_fixes",
                     "enabled": false
                 },
                 "fix_first_retract": {
                     "label": "Fix First Extrusion",
                     "description": "Avoid zeroing extruders at the beginning.",
                     "type": "bool",
-                    "default_value": "auto_apply_fixes",
+                    "default_value": false,
+                    "value": "auto_apply_fixes",
                     "enabled": false
                 },
                 "fix_temperature_oscilation": {
                     "label": "Fix Temperature Oscilation",
                     "description": "Fix bad target temperatures when printing with both extruders.",
                     "type": "bool",
-                    "default_value": "auto_apply_fixes",
+                    "default_value": false,
+                    "value": "auto_apply_fixes",
                     "enabled": false
                 },
                 "fix_tool_change_retraction_hop": {
                     "label": "Fix Tool Change Z Hop",
                     "description": "When changing between toolheads, first move X/Y and then move Z.",
                     "type": "bool",
-                    "default_value": "auto_apply_fixes",
+                    "default_value": false,
+                    "value": "auto_apply_fixes",
                     "enabled": false
                 }
             }

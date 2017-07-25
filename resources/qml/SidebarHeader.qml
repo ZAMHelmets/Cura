@@ -85,8 +85,10 @@ Column
 
                 onClicked:
                 {
-                    forceActiveFocus() // Changing focus applies the currently-being-typed values so it can change the displayed setting values.
-                    ExtruderManager.setActiveExtruderIndex(index);
+                    if (printMode.properties.value == "regular") {
+                        forceActiveFocus() // Changing focus applies the currently-being-typed values so it can change the displayed setting values.
+                        ExtruderManager.setActiveExtruderIndex(index);
+                    }
                 }
 
                 style: ButtonStyle
@@ -95,11 +97,13 @@ Column
                     {
                         border.width: UM.Theme.getSize("default_lining").width
                         border.color: control.checked ? UM.Theme.getColor("tab_checked_border") :
-                                      control.pressed ? UM.Theme.getColor("tab_active_border") :
-                                      control.hovered ? UM.Theme.getColor("tab_hovered_border") : UM.Theme.getColor("tab_unchecked_border")
+                                      control.pressed && printMode.properties.value == "regular" ? UM.Theme.getColor("tab_active_border") :
+                                      control.hovered && printMode.properties.value == "regular" ? UM.Theme.getColor("tab_hovered_border") :
+                                      UM.Theme.getColor("tab_unchecked_border")
                         color: control.checked ? UM.Theme.getColor("tab_checked") :
-                               control.pressed ? UM.Theme.getColor("tab_active") :
-                               control.hovered ? UM.Theme.getColor("tab_hovered") : UM.Theme.getColor("tab_unchecked")
+                               control.pressed && printMode.properties.value == "regular" ? UM.Theme.getColor("tab_active") :
+                               control.hovered && printMode.properties.value == "regular" ? UM.Theme.getColor("tab_hovered") :
+                               UM.Theme.getColor("tab_unchecked")
                         Behavior on color { ColorAnimation { duration: 50; } }
 
                         Rectangle
@@ -137,8 +141,9 @@ Column
                             anchors.rightMargin: UM.Theme.getSize("default_margin").width / 2
 
                             color: control.checked ? UM.Theme.getColor("tab_checked_text") :
-                                   control.pressed ? UM.Theme.getColor("tab_active_text") :
-                                   control.hovered ? UM.Theme.getColor("tab_hovered_text") : UM.Theme.getColor("tab_unchecked_text")
+                                   control.pressed && printMode.properties.value == "regular" ? UM.Theme.getColor("tab_active_text") :
+                                   control.hovered && printMode.properties.value == "regular" ? UM.Theme.getColor("tab_hovered_text") :
+                                   UM.Theme.getColor("tab_unchecked_text")
 
                             font: UM.Theme.getFont("default")
                             text: control.text
@@ -387,6 +392,16 @@ Column
 
         containerStackId: Cura.MachineManager.activeMachineId
         key: "machine_extruder_count"
+        watchedProperties: [ "value" ]
+        storeIndex: 0
+    }
+
+    UM.SettingPropertyProvider
+    {
+        id: printMode
+
+        containerStackId: Cura.MachineManager.activeMachineId
+        key: "print_mode"
         watchedProperties: [ "value" ]
         storeIndex: 0
     }

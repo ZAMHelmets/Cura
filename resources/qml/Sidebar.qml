@@ -302,12 +302,80 @@ Rectangle
         }
     }
 
+    Item
+    {
+        id: printModeCell
+        anchors.top: settingsModeLabel.bottom
+        anchors.topMargin: UM.Theme.getSize("default_margin").height * 2
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: childrenRect.height
+        visible: printModes.visible
+        enabled: printModes.visible
+
+        Text
+        {
+            id: printModeLabel
+            text: catalog.i18nc("@label", "Print Mode");
+            font: UM.Theme.getFont("default");
+            color: UM.Theme.getColor("text");
+            anchors.left: parent.left
+            anchors.leftMargin: UM.Theme.getSize("default_margin").width
+        }
+
+        ComboBox
+        {
+            id: printModeComboBox
+            model: printModeModel
+            anchors.left: printModeLabel.right
+            anchors.leftMargin: UM.Theme.getSize("default_margin").width
+            style: UM.Theme.styles.combobox;
+            currentIndex: printModes.visible ? printModes.activeIndex : -1
+            onActivated: printModes.changeProperty(printModeModel.get(index).text)
+        }
+
+        ListModel
+        {
+            id: printModeModel
+            Component.onCompleted: populatePrintModeModel()
+        }
+
+        Cura.PrintModesModel
+        {
+            id: printModes
+            onPrintModeChanged: updateIndex()
+            onPrinterChanged: updateValues()
+        }
+    }
+
+    function updateValues() {
+        printModes.update();
+        printModeCell.visible = printModes.visible;
+        printModeCell.enabled = printModes.visible;
+        populatePrintModeModel();
+    }
+
+    function updateIndex() {
+        printModeComboBox.currentIndex = printModes.activeIndex;
+    }
+
+    function populatePrintModeModel() {
+        printModes.clear();
+        if (printModes.visible) {
+            for (var i in printModes.printModes) {
+                printModeModel.append({
+                    text: printModes.printModes[i],
+                })
+            }
+        }
+    }
+
     StackView
     {
         id: sidebarContents
 
         anchors.bottom: footerSeparator.top
-        anchors.top: settingsModeSelection.bottom
+        anchors.top: printModeCell.visible ? printModeCell.bottom : settingsModeSelection.bottom
         anchors.topMargin: UM.Theme.getSize("default_margin").height
         anchors.left: base.left
         anchors.right: base.right

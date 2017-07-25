@@ -6,8 +6,7 @@
     "metadata": {
         "author": "Ultimaker",
         "manufacturer": "Ultimaker",
-        "category": "Ultimaker",
-        "weight": 1,
+        "category": "Other",
         "file_formats": "text/x-gcode",
         "platform": "ultimaker2_platform.obj",
         "platform_texture": "Ultimaker2Plusbackplate.png",

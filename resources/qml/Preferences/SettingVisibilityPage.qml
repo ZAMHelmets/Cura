@@ -116,7 +116,7 @@ UM.PreferencesPage
                     id: definitionsModel
                     containerId: Cura.MachineManager.activeDefinitionId
                     showAll: true
-                    exclude: ["machine_settings", "command_line_settings", "bcn3d_technologies_fixes"]
+                    exclude: ["machine_settings", "command_line_settings", "bcn3d_technologies_fixes", "print_mode"]
                     showAncestors: true
                     expanded: ["*"]
                     visibilityHandler: UM.SettingPreferenceVisibilityHandler { }

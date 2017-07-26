@@ -361,7 +361,7 @@ Rectangle
     }
 
     function populatePrintModeModel() {
-        printModes.clear();
+        printModeModel.clear();
         if (printModes.visible) {
             for (var i in printModes.printModes) {
                 printModeModel.append({

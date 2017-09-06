@@ -36,7 +36,6 @@ class PrintModesModel(UM.Qt.ListModel.ListModel):
         if value:
             key = next(x for x in self._print_modes if self._print_modes[x] == value)
             self._container.setProperty("print_mode", "value", key)
-            self._container.propertyChanged.emit("print_mode", "value")
 
     @pyqtSlot()
     def update(self):

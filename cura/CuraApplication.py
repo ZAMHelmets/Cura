@@ -32,15 +32,19 @@ from UM.Operations.AddSceneNodeOperation import AddSceneNodeOperation
 from UM.Operations.RemoveSceneNodeOperation import RemoveSceneNodeOperation
 from UM.Operations.GroupedOperation import GroupedOperation
 from UM.Operations.SetTransformOperation import SetTransformOperation
+
 from cura.Arrange import Arrange
 from cura.ShapeArray import ShapeArray
 from cura.ConvexHullDecorator import ConvexHullDecorator
 from cura.SetParentOperation import SetParentOperation
 from cura.SliceableObjectDecorator import SliceableObjectDecorator
 from cura.BlockSlicingDecorator import BlockSlicingDecorator
+from cura.DuplicatedNode import DuplicatedNode
 
 from cura.ArrangeObjectsJob import ArrangeObjectsJob
 from cura.MultiplyObjectsJob import MultiplyObjectsJob
+from cura.AddNodesOperation import AddNodesOperation
+from cura.RemoveNodesOperation import RemoveNodesOperation
 
 from UM.Settings.SettingDefinition import SettingDefinition, DefinitionPropertyType
 from UM.Settings.ContainerRegistry import ContainerRegistry
@@ -61,6 +65,7 @@ from . import ZOffsetDecorator
 from . import CuraSplashScreen
 from . import CameraImageProvider
 from . import MachineActionManager
+from . import PrintModeManager
 
 from cura.Settings.MachineManager import MachineManager
 from cura.Settings.MaterialManager import MaterialManager
@@ -84,11 +89,11 @@ from PyQt5.QtQml import qmlRegisterUncreatableType, qmlRegisterSingletonType, qm
 import sys
 import os.path
 import numpy
-import copy
 import urllib.parse
 import os
 import argparse
 import json
+import copy
 
 numpy.seterr(all="ignore")
 
@@ -287,6 +292,7 @@ class CuraApplication(QtApplication):
 
         preferences.addPreference("cura/currency", "€")
         preferences.addPreference("cura/material_settings", "{}")
+        preferences.addPreference("cura/old_material", "")
 
         preferences.addPreference("view/invert_zoom", False)
 
@@ -665,6 +671,8 @@ class CuraApplication(QtApplication):
         self._qml_import_paths.append(Resources.getPath(self.ResourceTypes.QmlFiles))
         self.initializeEngine()
 
+        self._print_mode_manager = PrintModeManager.PrintModeManager.getInstance()
+
         if self._engine.rootObjects:
             self.closeSplash()
 
@@ -969,7 +977,12 @@ class CuraApplication(QtApplication):
             op = GroupedOperation()
 
             for node in nodes:
-                op.addOperation(RemoveSceneNodeOperation(node))
+                print_mode_enabled = self.getGlobalContainerStack().getProperty("print_mode", "enabled")
+                if print_mode_enabled:
+                    node_dup = self._print_mode_manager.getDuplicatedNode(node)
+                    op.addOperation(RemoveNodesOperation(node_dup))
+                else:
+                    op.addOperation(RemoveSceneNodeOperation(node))
 
             op.push()
             Selection.clear()
@@ -1182,8 +1195,22 @@ class CuraApplication(QtApplication):
         group_node.setPosition(center)
         group_node.setCenterPosition(center)
 
-        # Move selected nodes into the group-node
-        Selection.applyOperation(SetParentOperation, group_node)
+        print_mode_enabled = self.getGlobalContainerStack().getProperty("print_mode", "enabled")
+        if print_mode_enabled:
+            print_mode = self.getGlobalContainerStack().getProperty("print_mode", "value")
+            duplicated_group_node = DuplicatedNode(group_node)
+            if print_mode != "regular":
+                duplicated_group_node.setParent(self.getController().getScene().getRoot())
+
+        op = GroupedOperation()
+        for node in Selection.getAllSelectedObjects():
+            if print_mode_enabled:
+                node_dup = self._print_mode_manager.getDuplicatedNode(node)
+                op.addOperation(SetParentOperation(node_dup, duplicated_group_node))
+
+            op.addOperation(SetParentOperation(node, group_node))
+
+        op.push()
 
         # Deselect individual nodes and select the group-node instead
         for node in group_node.getChildren():
@@ -1199,12 +1226,15 @@ class CuraApplication(QtApplication):
 
                 group_parent = node.getParent()
                 children = node.getChildren().copy()
+                duplicated_group_node = self._print_mode_manager.getDuplicatedNode(node)
+                children += duplicated_group_node.getChildren().copy()
                 for child in children:
                     # Set the parent of the children to the parent of the group-node
                     op.addOperation(SetParentOperation(child, group_parent))
 
                     # Add all individual nodes to the selection
-                    Selection.add(child)
+                    if type(child) != DuplicatedNode:
+                        Selection.add(child)
 
                 op.push()
                 # Note: The group removes itself from the scene once all its children have left it,
@@ -1315,7 +1345,6 @@ class CuraApplication(QtApplication):
         root = self.getController().getScene().getRoot()
         arranger = Arrange.create(scene_root = root)
         min_offset = 8
-
         self.fileLoaded.emit(filename)
 
         for node in nodes:
@@ -1354,7 +1383,13 @@ class CuraApplication(QtApplication):
                     # Step is for skipping tests to make it a lot faster. it also makes the outcome somewhat rougher
                     node, _ = arranger.findNodePlacement(node, offset_shape_arr, hull_shape_arr, step = 10)
 
-            op = AddSceneNodeOperation(node, scene.getRoot())
+            print_mode_enabled = self.getGlobalContainerStack().getProperty("print_mode", "enabled")
+            if print_mode_enabled:
+                node_dup = DuplicatedNode(node)
+                op = AddNodesOperation(node_dup, scene.getRoot())
+            else:
+                op = AddSceneNodeOperation(node, scene.getRoot())
+
             op.push()
             scene.sceneChanged.emit(node)
 

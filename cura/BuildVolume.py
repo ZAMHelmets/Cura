@@ -1,7 +1,10 @@
 # Copyright (c) 2016 Ultimaker B.V.
 # Cura is released under the terms of the AGPLv3 or higher.
 
+from cura.DuplicatedNode import DuplicatedNode
+from cura.PrintModeManager import PrintModeManager
 from cura.Settings.ExtruderManager import ExtruderManager
+
 from UM.Settings.ContainerRegistry import ContainerRegistry
 from UM.i18n import i18nCatalog
 from UM.Scene.Platform import Platform
@@ -225,6 +228,12 @@ class BuildVolume(SceneNode):
                             continue
                         node._outside_buildarea = True
                         continue
+
+        print_mode = self._global_container_stack.getProperty("print_mode", "value")
+        if print_mode != "regular":
+            duplicated_nodes = PrintModeManager.getInstance().getDuplicatedNodes()
+            for node_dup in duplicated_nodes:
+                node_dup._outside_buildarea = node_dup.node._outside_buildarea
 
         # Group nodes should override the _outside_buildarea property of their children.
         for group_node in group_nodes:
@@ -501,7 +510,11 @@ class BuildVolume(SceneNode):
         if property_name != "value":
             return
 
-        rebuild_me = False
+        if setting_key == "print_mode":
+            self._updateDisallowedAreas()
+            rebuild_me = True
+        else:
+            rebuild_me = False
         if setting_key == "print_sequence":
             machine_height = self._global_container_stack.getProperty("machine_height", "value")
             if Application.getInstance().getGlobalContainerStack().getProperty("print_sequence", "value") == "one_at_a_time" and len(self._scene_objects) > 1:
@@ -625,6 +638,38 @@ class BuildVolume(SceneNode):
         self._disallowed_areas = []
         for extruder_id in result_areas:
             self._disallowed_areas.extend(result_areas[extruder_id])
+
+        print_mode = self._global_container_stack.getProperty("print_mode", "value")
+        if print_mode != "regular":
+            if not len(self._disallowed_areas) > 4:
+                machine_width = self._global_container_stack.getProperty("machine_width", "value")
+                if len(list(result_areas.values())[0]) > 0:
+                    points = list(result_areas.values())[0][0].getPoints()
+                    margin = math.fabs(points[0][0] - points[2][0])
+                else:
+                    margin = 0
+
+                if print_mode == "mirror":
+                    machine_head_with_fans_polygon = self._global_container_stack.getProperty("machine_head_with_fans_polygon", "value")
+                    machine_head_size = math.fabs(machine_head_with_fans_polygon[0][0] - machine_head_with_fans_polygon[2][0])
+                    area = Polygon([
+                        [(-machine_head_size/2) - margin, -self._depth/2],
+                        [(-machine_head_size/2) - margin, self._depth/2],
+                        [machine_width, self._depth/2],
+                        [machine_width, -self._depth/2]
+                    ])
+                    self._disallowed_areas.extend([area])
+                elif print_mode == "duplication":
+                    area = Polygon([
+                        [-margin, -self._depth / 2],
+                        [-margin, self._depth / 2],
+                        [machine_width, self._depth / 2],
+                        [machine_width, -self._depth / 2]
+                    ])
+                    self._disallowed_areas.extend([area])
+            else:
+                if len(self._disallowed_areas) > 4:
+                    del self._disallowed_areas[-1]
 
     ##  Computes the disallowed areas for objects that are printed with print
     #   features.

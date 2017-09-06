@@ -14,10 +14,12 @@ from UM.Operations.GroupedOperation import GroupedOperation
 from UM.Operations.RemoveSceneNodeOperation import RemoveSceneNodeOperation
 from UM.Operations.SetTransformOperation import SetTransformOperation
 
+from cura.RemoveNodesOperation import RemoveNodesOperation
 from cura.SetParentOperation import SetParentOperation
 from cura.MultiplyObjectsJob import MultiplyObjectsJob
 from cura.Settings.SetObjectExtruderOperation import SetObjectExtruderOperation
 from cura.Settings.ExtruderManager import ExtruderManager
+from cura.PrintModeManager import PrintModeManager
 
 class CuraActions(QObject):
     def __init__(self, parent = None):
@@ -54,7 +56,8 @@ class CuraActions(QObject):
     #   \param count The number of times to multiply the selection.
     @pyqtSlot(int)
     def multiplySelection(self, count: int) -> None:
-        job = MultiplyObjectsJob(Selection.getAllSelectedObjects(), count, 8)
+        nodes = Selection.getAllSelectedObjects()
+        job = MultiplyObjectsJob(nodes, count, 8)
         job.start()
 
     ##  Delete all selected objects.
@@ -66,8 +69,14 @@ class CuraActions(QObject):
         removed_group_nodes = []
         op = GroupedOperation()
         nodes = Selection.getAllSelectedObjects()
+
         for node in nodes:
-            op.addOperation(RemoveSceneNodeOperation(node))
+            print_mode_enabled = Application.getInstance().getGlobalContainerStack().getProperty("print_mode", "enabled")
+            if print_mode_enabled:
+                node_dup = PrintModeManager.getInstance().getDuplicatedNode(node)
+                op.addOperation(RemoveNodesOperation(node_dup))
+            else:
+                op.addOperation(RemoveSceneNodeOperation(node))
             group_node = node.getParent()
             if group_node and group_node.callDecoration("isGroup") and group_node not in removed_group_nodes:
                 remaining_nodes_in_group = list(set(group_node.getChildren()) - set(nodes))

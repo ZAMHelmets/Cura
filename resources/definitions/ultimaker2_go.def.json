@@ -5,8 +5,9 @@
     "inherits": "ultimaker2",
     "metadata": {
         "author": "Ultimaker",
-        "manufacturer": "Ultimaker",
+        "manufacturer": "Ultimaker B.V.",
         "category": "Other",
+        "weight": 3,
         "file_formats": "text/x-gcode",
         "icon": "icon_ultimaker2.png",
         "platform": "ultimaker2go_platform.obj",

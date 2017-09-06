@@ -451,7 +451,7 @@ class BuildVolume(SceneNode):
 
     def _updateExtraZClearance(self) -> None:
         extra_z = 0.0
-        extruders = ExtruderManager.getInstance().getMachineExtruders(self._global_container_stack.getId())
+        extruders = ExtruderManager.getInstance().getUsedExtruderStacks()
         use_extruders = False
         for extruder in extruders:
             if extruder.getProperty("retraction_hop_enabled", "value"):
@@ -498,6 +498,7 @@ class BuildVolume(SceneNode):
 
             self._updateDisallowedAreas()
             self._updateRaftThickness()
+            self._updateExtraZClearance()
 
             if self._engine_ready:
                 self.rebuild()
@@ -559,6 +560,8 @@ class BuildVolume(SceneNode):
     #   would hit performance.
     def _updateDisallowedAreasAndRebuild(self):
         self._updateDisallowedAreas()
+        self._updateRaftThickness()
+        self._updateExtraZClearance()
         self.rebuild()
 
     def _updateDisallowedAreas(self):

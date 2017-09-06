@@ -161,8 +161,15 @@ class StartSliceJob(Job):
             # Only add extruder stacks if there are multiple extruders
             # Single extruder machines only use the global stack to store setting values
             if stack.getProperty("machine_extruder_count", "value") > 1:
-                for extruder_stack in ExtruderManager.getInstance().getMachineExtruders(stack.getId()):
-                    self._buildExtruderMessage(extruder_stack)
+                print_mode = Application.getInstance().getGlobalContainerStack().getProperty("print_mode", "value")
+                if print_mode == "regular":
+                    for extruder_stack in ExtruderManager.getInstance().getMachineExtruders(stack.getId()):
+                        self._buildExtruderMessage(extruder_stack)
+                else:
+                    main_extruder_stack = ExtruderManager.getInstance().getActiveExtruderStack()
+                    for extruder_stack in ExtruderManager.getInstance().getMachineExtruders(stack.getId()):
+                        self._buildExtruderMessage(main_extruder_stack, int(extruder_stack.getMetaDataEntry("position")))
+
             else:
                 self._buildExtruderMessageFromGlobalStack(stack)
 
@@ -218,9 +225,12 @@ class StartSliceJob(Job):
             return str(value).encode("utf-8")
 
     ##  Create extruder message from stack
-    def _buildExtruderMessage(self, stack):
+    def _buildExtruderMessage(self, stack, message_id = None):
         message = self._slice_message.addRepeatedMessage("extruders")
-        message.id = int(stack.getMetaDataEntry("position"))
+        if message_id is not None:
+            message.id = message_id
+        else:
+            message.id = int(stack.getMetaDataEntry("position"))
 
         material_instance_container = stack.findContainer({"type": "material"})
 

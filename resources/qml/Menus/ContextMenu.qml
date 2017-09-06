@@ -13,7 +13,7 @@ Menu
 {
     id: base
 
-    property bool shouldShowExtruders: machineExtruderCount.properties.value > 1;
+    property bool shouldShowExtruders: machineExtruderCount.properties.value > 1 && printMode.properties.value == "regular";
 
     // Selection-related actions.
     MenuItem { action: Cura.Actions.centerSelection; }
@@ -29,7 +29,7 @@ Menu
         MenuItem {
             text: "%1: %2 - %3".arg(model.name).arg(model.material).arg(model.variant)
             visible: base.shouldShowExtruders
-            enabled: UM.Selection.hasSelection
+            enabled: UM.Selection.hasSelection && base.shouldShowExtruders
             checkable: true
             checked: ExtruderManager.selectedObjectExtruders.indexOf(model.id) != -1
             onTriggered: CuraActions.setExtruderForSelection(model.id)
@@ -51,7 +51,11 @@ Menu
     // Group actions
     MenuSeparator {}
     MenuItem { action: Cura.Actions.groupObjects; }
-    MenuItem { action: Cura.Actions.mergeObjects; }
+    MenuItem {
+        action: Cura.Actions.mergeObjects;
+        enabled: printMode.properties.value == "regular";
+        visible: printMode.properties.value == "regular";
+    }
     MenuItem { action: Cura.Actions.unGroupObjects; }
 
     Connections
@@ -72,6 +76,15 @@ Menu
 
         containerStackId: Cura.MachineManager.activeMachineId
         key: "machine_extruder_count"
+        watchedProperties: [ "value" ]
+    }
+
+    UM.SettingPropertyProvider
+    {
+        id: printMode
+
+        containerStackId: Cura.MachineManager.activeMachineId
+        key: "print_mode"
         watchedProperties: [ "value" ]
     }
 

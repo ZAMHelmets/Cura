@@ -54,8 +54,8 @@ Makefile*
 junit-pytest-*
 CuraVersion.py
 cmake_install.cmake
-build/
-install_dir/
+build*/
+install_dir*/
 
 #Debug
 *.gcode

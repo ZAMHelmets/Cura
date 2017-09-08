@@ -32,7 +32,6 @@ class PrintModeManager:
 
         self.printModeChanged.connect(self._onPrintModeChanged)
         self._scene = Application.getInstance().getController().getScene()
-        # self._scene.sceneChanged.connect(self._onSceneChanged)
         self._onPrintModeChanged()
 
     def addDuplicatedNode(self, node):
@@ -109,20 +108,14 @@ class PrintModeManager:
                     Preferences.getInstance().setValue("cura/old_material", "")
 
     def _materialChanged(self):
-        print_mode = self._global_stack.getProperty("print_mode", "value")
-        if print_mode != "regular":
-            material = ExtruderManager.getInstance().getExtruderStack(0).material
-            ExtruderManager.getInstance().getExtruderStack(1).setMaterial(material)
+        if self._global_stack:
+            print_mode = self._global_stack.getProperty("print_mode", "value")
+            if print_mode != "regular":
+                material = ExtruderManager.getInstance().getExtruderStack(0).material
+                ExtruderManager.getInstance().getExtruderStack(1).setMaterial(material)
 
     def _setActiveExtruder(self, node):
         node.callDecoration("setActiveExtruder", ExtruderManager.getInstance().getExtruderStack(0).getId())
-
-    # def _onSceneChanged(self, node):
-    #     if self._global_stack:
-    #         print_mode = self._global_stack.getProperty("print_mode", "value")
-    #         if print_mode != "regular":
-    #             if type(node) == SceneNode:
-    #                 self._setActiveExtruder(node)
 
     @classmethod
     def getInstance(cls) -> "PrintModeManager":

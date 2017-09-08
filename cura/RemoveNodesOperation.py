@@ -26,7 +26,8 @@ class RemoveNodesOperation(Operation):
 
         self._print_mode_manager.addDuplicatedNode(self._node_dup)
         for child in self._node_dup.getChildren():
-            self._print_mode_manager.addDuplicatedNode(child)
+            if type(child) == DuplicatedNode:
+                self._print_mode_manager.addDuplicatedNode(child)
 
     def redo(self):
         old_parent = self._parent
@@ -35,7 +36,8 @@ class RemoveNodesOperation(Operation):
 
         self._print_mode_manager.deleteDuplicatedNode(self._node_dup)
         for child in self._node_dup.getChildren():
-            self._print_mode_manager.deleteDuplicatedNode(child)
+            if type(child) == DuplicatedNode:
+                self._print_mode_manager.deleteDuplicatedNode(child)
 
         if old_parent and old_parent.callDecoration("isGroup"):
             old_parent.callDecoration("recomputeConvexHull")

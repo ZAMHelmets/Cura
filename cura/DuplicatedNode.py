@@ -22,7 +22,10 @@ class DuplicatedNode(SceneNode):
             self.addDecorator(deepcopy(decorator))
 
         for child in node.getChildren():
-            self.addChild(deepcopy(child))
+            if type(child) == SceneNode:
+                self.addChild(DuplicatedNode(child))
+            else:
+                self.addChild(deepcopy(child))
 
         node.calculateBoundingBoxMesh()
         self.node.transformationChanged.connect(self._onTransformationChanged)
@@ -32,12 +35,6 @@ class DuplicatedNode(SceneNode):
 
     def setSelectable(self, select: bool):
         self._selectable = False
-
-    def connect(self):
-        self.node.transformationChanged.connect(self._onTransformationChanged)
-
-    def disconnect(self):
-        self.node.transformationChanged.disconnect(self._onTransformationChanged)
 
     def update(self):
         if type(self.getParent()) == DuplicatedNode:

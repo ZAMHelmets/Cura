@@ -1201,6 +1201,7 @@ class CuraApplication(QtApplication):
         group_node = SceneNode()
         group_decorator = GroupDecorator()
         group_node.addDecorator(group_decorator)
+        group_node.addDecorator(ConvexHullDecorator())
         group_node.setParent(self.getController().getScene().getRoot())
         group_node.setSelectable(True)
         center = Selection.getSelectionCenter()
@@ -1235,18 +1236,22 @@ class CuraApplication(QtApplication):
         for node in selected_objects:
             if node.callDecoration("isGroup"):
                 op = GroupedOperation()
-
                 group_parent = node.getParent()
                 children = node.getChildren().copy()
-                duplicated_group_node = self._print_mode_manager.getDuplicatedNode(node)
-                children += duplicated_group_node.getChildren().copy()
                 for child in children:
                     # Set the parent of the children to the parent of the group-node
                     op.addOperation(SetParentOperation(child, group_parent))
 
                     # Add all individual nodes to the selection
-                    if type(child) != DuplicatedNode:
-                        Selection.add(child)
+                    Selection.add(child)
+
+                print_mode_enabled = self.getGlobalContainerStack().getProperty("print_mode", "enabled")
+                if print_mode_enabled:
+                    duplicated_group_node = self._print_mode_manager.getDuplicatedNode(node)
+                    duplicated_group_parent = duplicated_group_node.getParent()
+                    duplicated_children = duplicated_group_node.getChildren().copy()
+                    for child in duplicated_children:
+                        op.addOperation(SetParentOperation(child, duplicated_group_parent))
 
                 op.push()
                 # Note: The group removes itself from the scene once all its children have left it,

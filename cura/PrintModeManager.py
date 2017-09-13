@@ -28,8 +28,6 @@ class PrintModeManager:
         Application.getInstance().globalContainerStackChanged.connect(self._onGlobalStackChanged)
         self._onGlobalStackChanged()
 
-        Application.getInstance().getMachineManager().activeMaterialChanged.connect(self._materialChanged)
-
         self.printModeChanged.connect(self._onPrintModeChanged)
         self._scene = Application.getInstance().getController().getScene()
         self._onPrintModeChanged()
@@ -77,6 +75,7 @@ class PrintModeManager:
 
         if self._global_stack:
             self._global_stack.propertyChanged.connect(self._onPropertyChanged)
+            ExtruderManager.getInstance().getExtruderStack(0).containersChanged.connect(self._materialChanged)
             if not self._global_stack.getProperty("print_mode", "enabled"):
                 self.deleteDuplicatedNodes()
 
@@ -89,8 +88,8 @@ class PrintModeManager:
     def _onPrintModeChanged(self):
         if self._global_stack:
             print_mode = self._global_stack.getProperty("print_mode", "value")
-            nodes = self._scene.getRoot().getChildren()
             if print_mode != "regular":
+                nodes = self._scene.getRoot().getChildren()
                 for node in nodes:
                     if type(node) == SceneNode:
                         self._setActiveExtruder(node)
@@ -107,12 +106,11 @@ class PrintModeManager:
                     self._old_material = ""
                     Preferences.getInstance().setValue("cura/old_material", "")
 
-    def _materialChanged(self):
-        if self._global_stack:
+    def _materialChanged(self, container):
+        if self._global_stack and container.getMetaDataEntry("type") == "material":
             print_mode = self._global_stack.getProperty("print_mode", "value")
             if print_mode != "regular":
-                material = ExtruderManager.getInstance().getExtruderStack(0).material
-                ExtruderManager.getInstance().getExtruderStack(1).setMaterial(material)
+                ExtruderManager.getInstance().getExtruderStack(1).setMaterial(container)
 
     def _setActiveExtruder(self, node):
         node.callDecoration("setActiveExtruder", ExtruderManager.getInstance().getExtruderStack(0).getId())

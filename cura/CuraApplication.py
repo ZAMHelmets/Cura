@@ -1,6 +1,7 @@
 # Copyright (c) 2017 Ultimaker B.V.
 # Cura is released under the terms of the AGPLv3 or higher.
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtNetwork import QLocalServer
 from PyQt5.QtNetwork import QLocalSocket
 
@@ -1439,3 +1440,8 @@ class CuraApplication(QtApplication):
                     node = node.getParent()
 
                 Selection.add(node)
+
+    def showSplashMessage(self, message):
+        if self._splash:
+            self._splash.showMessage(message, Qt.AlignLeft | Qt.AlignBottom)
+            self.processEvents()

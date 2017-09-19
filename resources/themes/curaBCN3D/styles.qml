@@ -72,10 +72,8 @@ QtObject {
                 color: {
                     if (control.pressed || (control.checkable && control.checked)) {
                         return UM.Theme.getColor("sidebar_header_active");
-                    } else if(control.hovered) {
-                        return UM.Theme.getColor("sidebar_header_hover");
                     } else {
-                        return UM.Theme.getColor("sidebar_header_bar");
+                        return UM.Theme.getColor("mode_switch_handle");
                     }
                 }
                 Behavior on color { ColorAnimation { duration: 50; } }

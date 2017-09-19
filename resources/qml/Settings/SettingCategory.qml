@@ -60,7 +60,7 @@ Button {
     {
         id: settingsButton
 
-        visible: base.hovered || settingsButton.hovered
+        visible: base.hovered || settingsButton.hovered || inheritButton.hovered
         height: base.height * 0.6
         width: base.height * 0.6
 

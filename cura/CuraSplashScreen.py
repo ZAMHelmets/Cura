@@ -13,7 +13,7 @@ class CuraSplashScreen(QSplashScreen):
         super().__init__()
         self._scale = round(QFontMetrics(QCoreApplication.instance().font()).ascent() / 12)
 
-        splash_image = QPixmap(Resources.getPath(Resources.Images, "cura.png"))
+        splash_image = QPixmap(Resources.getPath(Resources.Images, "curabcn3d_splash.png"))
         self.setPixmap(splash_image.scaled(splash_image.size() * self._scale))
 
     def drawContents(self, painter):

@@ -77,7 +77,10 @@ class PrintModeManager:
             self._global_stack.propertyChanged.connect(self._onPropertyChanged)
             ExtruderManager.getInstance().getExtruderStack(0).containersChanged.connect(self._materialChanged)
             if not self._global_stack.getProperty("print_mode", "enabled"):
+                self.removeDuplicatedNodes()
                 self.deleteDuplicatedNodes()
+            else:
+                self._onPrintModeChanged()
 
     printModeChanged = Signal()
 

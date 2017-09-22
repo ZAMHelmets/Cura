@@ -57,4 +57,5 @@ class PrintModesModel(UM.Qt.ListModel.ListModel):
     printerChanged = pyqtSignal()
 
     def _onPrinterChanged(self):
+        self._container = Application.getInstance().getGlobalContainerStack()
         self.printerChanged.emit()

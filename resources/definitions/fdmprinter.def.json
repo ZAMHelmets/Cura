@@ -5826,12 +5826,12 @@
                     "description": "When printing with one hotend only, avoid heating the other one.",
                     "type": "bool",
                     "default_value": false,
-                    "value": "auto_apply_fixes",
+                    "value": "auto_apply_fixes and print_mode == 'regular'",
                     "enabled": false
                 },
                 "fix_first_retract": {
                     "label": "Fix First Extrusion",
-                    "description": "Avoid zeroing extruders at the beginning.",
+                    "description": "Zero extruders at the beginning, so it starts properly.",
                     "type": "bool",
                     "default_value": false,
                     "value": "auto_apply_fixes",

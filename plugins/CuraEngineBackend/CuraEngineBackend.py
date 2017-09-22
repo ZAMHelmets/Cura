@@ -165,9 +165,6 @@ class CuraEngineBackend(QObject, Backend):
     ##  Emitted when the slicing process is aborted forcefully.
     slicingCancelled = Signal()
 
-    ## Emitted when the slicing process is finished
-    slicingFinished = Signal()
-
     @pyqtSlot()
     def stopSlicing(self):
         self.backendStateChange.emit(BackendState.NotStarted)
@@ -482,7 +479,6 @@ class CuraEngineBackend(QObject, Backend):
     def _onSlicingFinishedMessage(self, message):
         self.backendStateChange.emit(BackendState.Done)
         self.processingProgress.emit(1.0)
-        self.slicingFinished.emit()
 
         for line in self._scene.gcode_list:
             replaced = line.replace("{print_time}", str(Application.getInstance().getPrintInformation().currentPrintTime.getDisplayString(DurationFormat.Format.ISO8601)))

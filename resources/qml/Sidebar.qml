@@ -317,7 +317,7 @@ Rectangle
         Text
         {
             id: printModeLabel
-            text: catalog.i18nc("@label", "Print Mode");
+            text: printMode.properties.label
             font: UM.Theme.getFont("default");
             color: UM.Theme.getColor("text");
             anchors.left: parent.left
@@ -354,6 +354,7 @@ Rectangle
         printModeCell.visible = printModes.visible;
         printModeCell.enabled = printModes.visible;
         populatePrintModeModel();
+        updateIndex();
     }
 
     function updateIndex() {
@@ -558,6 +559,16 @@ Rectangle
         containerStackId: Cura.MachineManager.activeMachineId
         key: "machine_heated_bed"
         watchedProperties: [ "value" ]
+        storeIndex: 0
+    }
+
+    UM.SettingPropertyProvider
+    {
+        id: printMode
+
+        containerStackId: Cura.MachineManager.activeMachineId
+        key: "print_mode"
+        watchedProperties: [ "label" ]
         storeIndex: 0
     }
 }

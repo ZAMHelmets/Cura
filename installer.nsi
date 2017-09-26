@@ -1,19 +1,19 @@
 !ifndef VERSION
-  !define VERSION '1.0.0'
+  !define VERSION '1.0'
 !endif
 
 ; The name of the installer
 Name "Cura ${VERSION}"
 
 ; The file to write
-OutFile "CuraBCN3D_${VERSION}.exe"
+OutFile "BCN3D_Cura_${VERSION}.exe"
 
 ; The default installation directory
-InstallDir $PROGRAMFILES\CuraBCN3D_${VERSION}
+InstallDir $PROGRAMFILES\BCN3D_Cura_${VERSION}
 
 ; Registry key to check for directory (so if you install again, it will 
 ; overwrite the old one automatically)
-InstallDirRegKey HKLM "Software\CuraBCN3D_${VERSION}" "Install_Dir"
+InstallDirRegKey HKLM "Software\BCN3D_Cura_${VERSION}" "Install_Dir"
 
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
@@ -41,7 +41,7 @@ SetCompressor /SOLID lzma
 
 ;Run Cura after installing
 !define MUI_FINISHPAGE_RUN
-!define MUI_FINISHPAGE_RUN_TEXT "Start CuraBCN3D ${VERSION}"
+!define MUI_FINISHPAGE_RUN_TEXT "Start BCN3D_Cura ${VERSION}"
 !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchLink"
 
 ;Add an option to show release notes
@@ -67,7 +67,7 @@ ReserveFile '${NSISDIR}\Plugins\x86-unicode\InstallOptions.dll'
 ;--------------------------------
 
 ; The stuff to install
-Section "CuraBCN3D ${VERSION}"
+Section "BCN3D_Cura ${VERSION}"
 
   SectionIn RO
   
@@ -78,28 +78,28 @@ Section "CuraBCN3D ${VERSION}"
   File /r "dist\"
   
   ; Write the installation path into the registry
-  WriteRegStr HKLM "SOFTWARE\CuraBCN3D_${VERSION}" "Install_Dir" "$INSTDIR"
+  WriteRegStr HKLM "SOFTWARE\BCN3D_Cura_${VERSION}" "Install_Dir" "$INSTDIR"
   
   ; Write the uninstall keys for Windows
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CuraBCN3D_${VERSION}" "DisplayName" "CuraBCN3D ${VERSION}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CuraBCN3D_${VERSION}" "UninstallString" '"$INSTDIR\uninstall.exe"'
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CuraBCN3D_${VERSION}" "NoModify" 1
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CuraBCN3D_${VERSION}" "NoRepair" 1
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BCN3D_Cura_${VERSION}" "DisplayName" "BCN3D_Cura ${VERSION}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BCN3D_Cura_${VERSION}" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BCN3D_Cura_${VERSION}" "NoModify" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BCN3D_Cura_${VERSION}" "NoRepair" 1
   WriteUninstaller "uninstall.exe"
 
   ; Write start menu entries for all users
   SetShellVarContext all
   
-  CreateDirectory "$SMPROGRAMS\CuraBCN3D ${VERSION}"
-  CreateShortCut "$SMPROGRAMS\CuraBCN3D ${VERSION}\Uninstall CuraBCN3D ${VERSION}.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
-  CreateShortCut "$SMPROGRAMS\CuraBCN3D ${VERSION}\CuraBCN3D ${VERSION}.lnk" "$INSTDIR\CuraBCN3D.exe" '' "$INSTDIR\CuraBCN3D.exe" 0
+  CreateDirectory "$SMPROGRAMS\BCN3D_Cura ${VERSION}"
+  CreateShortCut "$SMPROGRAMS\BCN3D_Cura ${VERSION}\Uninstall BCN3D_Cura ${VERSION}.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+  CreateShortCut "$SMPROGRAMS\BCN3D_Cura ${VERSION}\BCN3D_Cura ${VERSION}.lnk" "$INSTDIR\BCN3D_Cura.exe" '' "$INSTDIR\BCN3D_Cura.exe" 0
   
 SectionEnd
 
 Function LaunchLink
   ; Write start menu entries for all users
   SetShellVarContext all
-  Exec '"$WINDIR\explorer.exe" "$SMPROGRAMS\CuraBCN3D ${VERSION}\CuraBCN3D ${VERSION}.lnk"'
+  Exec '"$WINDIR\explorer.exe" "$SMPROGRAMS\BCN3D_Cura ${VERSION}\BCN3D_Cura ${VERSION}.lnk"'
 FunctionEnd
 
 Section "Install Visual Studio 2010 Redistributable"
@@ -128,17 +128,17 @@ SectionEnd
 Section "Open STL files with Cura"
 	WriteRegStr HKCR .stl "" "Cura STL model file"
 	DeleteRegValue HKCR .stl "Content Type"
-	WriteRegStr HKCR "Cura STL model file\DefaultIcon" "" "$INSTDIR\CuraBCN3D.exe,0"
+	WriteRegStr HKCR "Cura STL model file\DefaultIcon" "" "$INSTDIR\BCN3D_Cura.exe,0"
 	WriteRegStr HKCR "Cura STL model file\shell" "" "open"
-	WriteRegStr HKCR "Cura STL model file\shell\open\command" "" '"$INSTDIR\CuraBCN3D.exe" "%1"'
+	WriteRegStr HKCR "Cura STL model file\shell\open\command" "" '"$INSTDIR\BCN3D_Cura.exe" "%1"'
 SectionEnd
 
 Section /o "Open OBJ files with Cura"
 	WriteRegStr HKCR .obj "" "Cura OBJ model file"
 	DeleteRegValue HKCR .obj "Content Type"
-	WriteRegStr HKCR "Cura OBJ model file\DefaultIcon" "" "$INSTDIR\CuraBCN3D.exe,0"
+	WriteRegStr HKCR "Cura OBJ model file\DefaultIcon" "" "$INSTDIR\BCN3D_Cura.exe,0"
 	WriteRegStr HKCR "Cura OBJ model file\shell" "" "open"
-	WriteRegStr HKCR "Cura OBJ model file\shell\open\command" "" '"$INSTDIR\CuraBCN3D.exe" "%1"'
+	WriteRegStr HKCR "Cura OBJ model file\shell\open\command" "" '"$INSTDIR\BCN3D_Cura.exe" "%1"'
 SectionEnd
 
 ;--------------------------------
@@ -148,13 +148,13 @@ SectionEnd
 Section "Uninstall"
   
   ; Remove registry keys
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\CuraBCN3D_${VERSION}"
-  DeleteRegKey HKLM "SOFTWARE\CuraBCN3D_${VERSION}"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BCN3D_Cura_${VERSION}"
+  DeleteRegKey HKLM "SOFTWARE\BCN3D_Cura_${VERSION}"
 
   ; Write start menu entries for all users
   SetShellVarContext all
   ; Remove directories used
-  RMDir /r "$SMPROGRAMS\CuraBCN3D ${VERSION}"
+  RMDir /r "$SMPROGRAMS\BCN3D_Cura ${VERSION}"
   RMDir /r "$INSTDIR"
 
 SectionEnd

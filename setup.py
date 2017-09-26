@@ -65,16 +65,16 @@ build_exe_options = {
 }
 
 setup(  
-    name="CuraBCN3D",
-    version="1.0.0",
-    author="Ultimaker",
-    author_email="a.hiemstra@ultimaker.com",
-    url="http://software.ultimaker.com/",
+    name="BCN3D_Cura",
+    version="1.0-beta",
+    author="BCN3D Technologies",
+    author_email="",
+    url="",
     license="GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)",
     options = {
         "build_exe": build_exe_options
     },
-    executables = [Executable(script="cura_app.py", base=base, icon="icons/cura.ico", targetName="CuraBCN3D.exe")]
+    executables = [Executable(script="cura_app.py", base=base, icon="icons/cura.ico", targetName="BCN3D_Cura.exe")]
 )
 
 print("Coping Cura plugins.")

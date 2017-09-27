@@ -39,9 +39,9 @@ SetCompressor /SOLID lzma
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
-;Run Cura after installing
+;Run BCN3D Cura after installing
 !define MUI_FINISHPAGE_RUN
-!define MUI_FINISHPAGE_RUN_TEXT "Start Cura ${VERSION}"
+!define MUI_FINISHPAGE_RUN_TEXT "Start BCN3D Cura ${VERSION}"
 !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchLink"
 
 ;Add an option to show release notes
@@ -67,7 +67,7 @@ ReserveFile '${NSISDIR}\Plugins\InstallOptions.dll'
 ;--------------------------------
 
 ; The stuff to install
-Section "Cura ${VERSION}"
+Section "BCN3D Cura ${VERSION}"
 
   SectionIn RO
   
@@ -81,10 +81,10 @@ Section "Cura ${VERSION}"
   WriteRegStr HKLM "SOFTWARE\BCN3D_Cura_${VERSION}" "Install_Dir" "$INSTDIR"
   
   ; Write the uninstall keys for Windows
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cura_${VERSION}" "DisplayName" "BCN3D Cura ${VERSION}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cura_${VERSION}" "UninstallString" '"$INSTDIR\uninstall.exe"'
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cura_${VERSION}" "NoModify" 1
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cura_${VERSION}" "NoRepair" 1
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BCN3D_Cura_${VERSION}" "DisplayName" "BCN3D Cura ${VERSION}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BCN3D_Cura_${VERSION}" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BCN3D_Cura_${VERSION}" "NoModify" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BCN3D_Cura_${VERSION}" "NoRepair" 1
   WriteUninstaller "uninstall.exe"
 
   ; Write start menu entries for all users

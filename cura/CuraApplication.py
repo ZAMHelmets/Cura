@@ -209,7 +209,7 @@ class CuraApplication(QtApplication):
 
         self._additional_components = {} # Components to add to certain areas in the interface
 
-        super().__init__(name = "curaBCN3D", version = CuraVersion, buildtype = CuraBuildType)
+        super().__init__(name = "BCN3D Cura", version = CuraVersion, buildtype = CuraBuildType)
 
         self.setWindowIcon(QIcon(Resources.getPath(Resources.Images, "cura-icon.png")))
 

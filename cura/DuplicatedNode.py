@@ -39,7 +39,6 @@ class DuplicatedNode(SceneNode):
     def update(self):
         if type(self.getParent()) == DuplicatedNode:
             self.setTransformation(self.node.getLocalTransformation())
-            # self.setPosition(self.node.getPosition())
             return
         print_mode = Application.getInstance().getGlobalContainerStack().getProperty("print_mode", "value")
         machine_width = Application.getInstance().getGlobalContainerStack().getProperty("machine_width", "value")

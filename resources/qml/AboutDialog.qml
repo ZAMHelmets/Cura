@@ -66,7 +66,7 @@ UM.Dialog
         width: parent.width
 
         //: About dialog application author note
-        text: catalog.i18nc("@info:credit","Cura is developed by Ultimaker B.V. in cooperation with the community.\nCura proudly uses the following open source projects:")
+        text: catalog.i18nc("@info:credit","BCN3D Cura is developed by BCN3D Technologies based on the open source project Cura developed by Ultimaker B.V. in cooperation with the community.\nBCN3D Cura uses the following open source projects:")
         font: UM.Theme.getFont("system")
         wrapMode: Text.WordWrap
         anchors.top: description.bottom
@@ -115,6 +115,7 @@ UM.Dialog
             }
             Component.onCompleted:
             {
+                projectsModel.append({ name:"BCN3D Cura", description: catalog.i18nc("@label", "Graphical user interface"), license: "AGPLv3", url: "https://github.com/BCN3D/Cura" });
                 projectsModel.append({ name:"Cura", description: catalog.i18nc("@label", "Graphical user interface"), license: "AGPLv3", url: "https://github.com/Ultimaker/Cura" });
                 projectsModel.append({ name:"Uranium", description: catalog.i18nc("@label", "Application framework"), license: "AGPLv3", url: "https://github.com/Ultimaker/Uranium" });
                 projectsModel.append({ name:"CuraEngine", description: catalog.i18nc("@label", "GCode generator"), license: "AGPLv3", url: "https://github.com/Ultimaker/CuraEngine" });

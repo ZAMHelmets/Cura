@@ -1896,7 +1896,7 @@
                 "max_retract":
                 {
                     "label": "Max. Retraction Count",
-                    "description": "For the Left Extruder: Number of retractions occurring within the retraction distance. When the number of retractions is reached, active extruder will park, prime and come back (stronger than ever ;)",
+                    "description": "Number of retractions occurring within the retraction distance. When the number of retractions is reached, active extruder will park, prime and come back.",
                     "type": "int",
                     "default_value": 50,
                     "minimum_value": "0",
@@ -4983,7 +4983,7 @@
                 "print_mode":
                 {
                     "label": "Print Mode",
-                    "description": "Choose the print mode",
+                    "description": "Choose the print mode.",
                     "type": "enum",
                     "options":
                     {

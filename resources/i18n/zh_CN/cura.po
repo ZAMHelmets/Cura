@@ -773,9 +773,9 @@ msgstr "错误报告"
 msgctxt "@label"
 msgid ""
 "<p>A fatal exception has occurred that we could not recover from!</p>\n"
-"        <p>Please use the information below to post a bug report at <a href=\"http://github.com/Ultimaker/Cura/issues\">http://github.com/Ultimaker/Cura/issues</a></p>\n"
+"        <p>Please use the information below to post a bug report at <a href=\"http://github.com/BCN3D/Cura/issues\">http://github.com/BCN3D/Cura/issues</a></p>\n"
 "    "
-msgstr "<p>发生了致命错误，我们无法恢复！</p>\n        <p>请在以下网址中使用下方的信息提交错误报告：<a href=\"http://github.com/Ultimaker/Cura/issues\">http://github.com/Ultimaker/Cura/issues</a></p>"
+msgstr "<p>发生了致命错误，我们无法恢复！</p>\n        <p>请在以下网址中使用下方的信息提交错误报告：<a href=\"http://github.com/BCN3D/Cura/issues\">http://github.com/BCN3D/Cura/issues</a></p>"
 
 #: /home/ruben/Projects/Cura/cura/CrashHandler.py:112
 msgctxt "@action:button"

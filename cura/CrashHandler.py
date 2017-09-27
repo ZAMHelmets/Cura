@@ -77,7 +77,7 @@ def show(exception_type, value, tb):
 
     #label.setScaledContents(True)
     label.setText(catalog.i18nc("@label", """<p>A fatal exception has occurred that we could not recover from!</p>
-        <p>Please use the information below to post a bug report at <a href=\"http://github.com/Ultimaker/Cura/issues\">http://github.com/Ultimaker/Cura/issues</a></p>
+        <p>Please use the information below to post a bug report at <a href=\"http://github.com/BCN3D/Cura/issues\">http://github.com/BCN3D/Cura/issues</a></p>
     """))
 
     textarea = QTextEdit(dialog)
@@ -111,7 +111,7 @@ def show(exception_type, value, tb):
     layout.addWidget(buttons)
     buttons.addButton(catalog.i18nc("@action:button", "Open Web Page"), QDialogButtonBox.HelpRole)
     buttons.rejected.connect(dialog.close)
-    buttons.helpRequested.connect(lambda: webbrowser.open("http://github.com/Ultimaker/Cura/issues"))
+    buttons.helpRequested.connect(lambda: webbrowser.open("http://github.com/BCN3D/Cura/issues"))
 
     dialog.exec_()
     sys.exit(1)

@@ -1663,6 +1663,26 @@ msgid "This setting limits the number of retractions occurring within the minimu
 msgstr "Este ajuste limita el número de retracciones que ocurren dentro de la ventana de distancia mínima de extrusión. Dentro de esta ventana se ignorarán las demás retracciones. Esto evita retraer repetidamente el mismo trozo de filamento, ya que esto podría aplanar el filamento y causar problemas de desmenuzamiento."
 
 #: fdmprinter.def.json
+msgctxt "avoid_grinding_filament label"
+msgid "Prevent Filament Grinding"
+msgstr "Prevención de mordedura del filamento"
+
+#: fdmprinter.def.json
+msgctxt "avoid_grinding_filament description"
+msgid "When retracting repeatedly, this option moves the hotend to the purge tray and primes the needed amount of filament to allow working on a new piece of it. Disabling this feature can flatten the filament and cause grinding issues."
+msgstr "Realizar una purga en el cajetín para renovar la parte del hilo en contacto con el grafilado del extrusor en caso de hacer una determinada cantidad de retracciones. Desactivar esta opción puede producir aplastamiento del filamento y/o mordedura del mismo."
+
+#: fdmprinter.def.json
+msgctxt "max_retract label"
+msgid "Max. Retraction Count"
+msgstr "Max. núm. retracciones"
+
+#: fdmprinter.def.json
+msgctxt "max_retract description"
+msgid "Number of retractions occurring within the retraction distance. When the number of retractions is reached, active extruder will park, prime and come back."
+msgstr "Cantidad de retracciones admitidas en un mismo fragmento de filamento. Cuando se supere esta cantidad, el extrusor activo volverá al cajetín, prugará y reprenderá la impresión."
+
+#: fdmprinter.def.json
 msgctxt "retraction_extrusion_window label"
 msgid "Minimum Extrusion Distance Window"
 msgstr "Ventana de distancia mínima de extrusión"
@@ -2496,6 +2516,17 @@ msgstr "Salto en Z tras cambio de extrusor"
 msgctxt "retraction_hop_after_extruder_switch description"
 msgid "After the machine switched from one extruder to the other, the build plate is lowered to create clearance between the nozzle and the print. This prevents the nozzle from leaving oozed material on the outside of a print."
 msgstr "Cuando la máquina cambia de un extrusor a otro, la placa de impresión se baja para crear holgura entre la tobera y la impresión. Esto impide que el material rezumado quede fuera de la impresión."
+
+#: fdmprinter.def.json
+msgctxt "retraction_hop_height_after_extruder_switch label"
+msgid "Z Hop Height After Extruder Switch"
+msgstr "Altura del salto en Z al cambiar de extrusor"
+
+#: fdmprinter.def.json
+msgctxt "retraction_hop_height_after_extruder_switch description"
+msgid "Distance to lift Z when changing toolheads."
+msgstr "Distancia a elevar el cabezal cuando se cambia de extrusor."
+
 
 #: fdmprinter.def.json
 msgctxt "cooling label"
@@ -3810,6 +3841,36 @@ msgid "Distance of the ooze shield from the print, in the X/Y directions."
 msgstr "Distancia entre la placa de rezumado y la impresión, en las direcciones X/Y."
 
 #: fdmprinter.def.json
+msgctxt "smart_purge label"
+msgid "Smart Purge"
+msgstr "Purga inteligente"
+
+#: fdmprinter.def.json
+msgctxt "smart_purge description"
+msgid "Add an extra prime amount to compensate oozed material while the Extruder was idle. Disable Prime tower to save time and filament."
+msgstr "Distancia a elevar el cabezal cuando se cambia de extrusor."
+
+#: fdmprinter.def.json
+msgctxt "minimum_extrusion label"
+msgid "Minimum Extrusion"
+msgstr "Extrusión mínima"
+
+#: fdmprinter.def.json
+msgctxt "minimum_extrusion description"
+msgid "Minimum filament length to be extruded in the layer to avoid purge."
+msgstr "Si en la capa no se llega a extruir esta cantidad, se habilitará la purga inteligente."
+
+#: fdmprinter.def.json
+msgctxt "purge_length label"
+msgid "Purge Length"
+msgstr "Cantidad de purga"
+
+#: fdmprinter.def.json
+msgctxt "purge_length description"
+msgid "Purged distance when purge is needed."
+msgstr "Distancia de filamento extruida en caso de ser necesaria la purga."
+
+#: fdmprinter.def.json
 msgctxt "meshfix label"
 msgid "Mesh Fixes"
 msgstr "Correcciones de malla"
@@ -4063,6 +4124,31 @@ msgstr "Contornos espiralizados suaves"
 msgctxt "smooth_spiralized_contours description"
 msgid "Smooth the spiralized contours to reduce the visibility of the Z seam (the Z-seam should be barely visible on the print but will still be visible in the layer view). Note that smoothing will tend to blur fine surface details."
 msgstr "Suavice los contornos espiralizados para reducir la visibilidad de la costura Z (la costura Z debería ser apenas visible en la impresora pero seguirá siendo visible en la vista de capas). Tenga en cuenta que la suavización tenderá a desdibujar detalles finos de la superficie."
+
+#: fdmprinter.def.json
+msgctxt "print_mode label"
+msgid "Print Mode"
+msgstr "Modo de impresión"
+
+#: fdmprinter.def.json
+msgctxt "print_mode description"
+msgid "Choose the print mode."
+msgstr "Elige el modo de impresión."
+
+#: fdmprinter.def.json
+msgctxt "print_mode option regular"
+msgid "Regular"
+msgstr "Normal"
+
+#: fdmprinter.def.json
+msgctxt "print_mode option mirror"
+msgid "Mirror"
+msgstr "Espejo"
+
+#: fdmprinter.def.json
+msgctxt "print_mode option duplication"
+msgid "Duplication"
+msgstr "Duplicar"
 
 #: fdmprinter.def.json
 msgctxt "experimental label"
@@ -4670,6 +4756,16 @@ msgstr "Inserción de alisado"
 msgctxt "ironing_inset description"
 msgid "A distance to keep from the edges of the model. Ironing all the way to the edge of the mesh may result in a jagged edge on your print."
 msgstr "Distancia que debe guardarse desde el borde del modelo. Si se alisa hasta el borde de la malla, puede quedar un borde irregular."
+
+#: fdmprinter.def.json
+msgctxt "retract_reduction label"
+msgid "Reduce Retraction"
+msgstr "Reducir retracciones"
+
+#: fdmprinter.def.json
+msgctxt "retract_reduction description"
+msgid "Retract only on outer walls and top/bottom layers."
+msgstr "Deshabilitar todas las retracciones excepto en las paredes exteriores y las capas superiores/inferiores."
 
 #: fdmprinter.def.json
 msgctxt "command_line_settings label"

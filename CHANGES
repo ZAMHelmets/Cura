@@ -163,7 +163,7 @@ Known Issues
 ------------
 
 For an up to date list of all known issues, please see
-https://github.com/Ultimaker/Cura/issues and
+https://github.com/BCN3D/Cura/issues and
 https://github.com/Ultimaker/Uranium/issues .
 
 * Some OBJ files are rendered as black objects due to missing

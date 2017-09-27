@@ -775,11 +775,11 @@ msgstr "Raport awarii"
 msgctxt "@label"
 msgid ""
 "<p>A fatal exception has occurred that we could not recover from!</p>\n"
-"        <p>Please use the information below to post a bug report at <a href=\"http://github.com/Ultimaker/Cura/issues\">http://github.com/Ultimaker/Cura/issues</a></p>\n"
+"        <p>Please use the information below to post a bug report at <a href=\"http://github.com/BCN3D/Cura/issues\">http://github.com/BCN3D/Cura/issues</a></p>\n"
 "    "
 msgstr ""
 "<p>Pojawił się fatalny wyjątek, z którego nie możemy odzyskać!</p>\n"
-"        <p>Aby przesłać zgłoszenie błędu, skorzystaj z poniższych informacji <a href=\"http://github.com/Ultimaker/Cura/issues\">http://github.com/Ultimaker/Cura/issues</a></p>\n"
+"        <p>Aby przesłać zgłoszenie błędu, skorzystaj z poniższych informacji <a href=\"http://github.com/BCN3D/Cura/issues\">http://github.com/BCN3D/Cura/issues</a></p>\n"
 "    "
 
 #: /home/ruben/Projects/Cura/cura/CrashHandler.py:112

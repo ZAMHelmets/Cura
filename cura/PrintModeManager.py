@@ -5,6 +5,7 @@ from UM.Scene.SceneNode import SceneNode
 from UM.Operations.AddSceneNodeOperation import AddSceneNodeOperation
 from UM.Operations.RemoveSceneNodeOperation import RemoveSceneNodeOperation
 
+from cura.DuplicatedNode import DuplicatedNode
 from cura.Settings.ExtruderManager import ExtruderManager
 
 class PrintModeManager:
@@ -17,6 +18,7 @@ class PrintModeManager:
         PrintModeManager._instance = self
 
         self._duplicated_nodes = []
+        self._scene = Application.getInstance().getController().getScene()
 
         old_material_id = Preferences.getInstance().getValue("cura/old_material")
         if Application.getInstance().getContainerRegistry().findContainers(id=old_material_id):
@@ -29,7 +31,6 @@ class PrintModeManager:
         self._onGlobalStackChanged()
 
         self.printModeChanged.connect(self._onPrintModeChanged)
-        self._scene = Application.getInstance().getController().getScene()
         self._onPrintModeChanged()
 
     def addDuplicatedNode(self, node):
@@ -80,6 +81,10 @@ class PrintModeManager:
                 self.removeDuplicatedNodes()
                 self.deleteDuplicatedNodes()
             else:
+                if len(self._duplicated_nodes) == 0:
+                    for node in self._scene.getRoot().getChildren():
+                        if type(node) == SceneNode:
+                            self.addDuplicatedNode(DuplicatedNode(node, node.getParent()))
                 self._onPrintModeChanged()
 
     printModeChanged = Signal()

@@ -209,47 +209,6 @@ Column
             }
         }
 
-        Button
-        {
-            id: materialInfoButton
-            height: parent.height * 0.60
-            width: height
-
-            anchors.right: materialVariantContainer.left
-            anchors.rightMargin: UM.Theme.getSize("default_margin").width
-            anchors.verticalCenter: parent.verticalCenter
-
-            visible: extrudersList.visible
-
-            text: "i"
-            style: UM.Theme.styles.info_button
-
-            onClicked:
-            {
-                // open the material URL with web browser
-                var version = UM.Application.version;
-                var machineName = Cura.MachineManager.activeMachine.definition.id;
-
-                var url = "https://ultimaker.com/materialcompatibility/" + version + "/" + machineName;
-                Qt.openUrlExternally(url);
-            }
-
-            onHoveredChanged:
-            {
-                if (hovered)
-                {
-                    var content = catalog.i18nc("@tooltip", "Click to check the material compatibility on Ultimaker.com.");
-                    base.showTooltip(
-                        extruderSelectionRow, Qt.point(0, extruderSelectionRow.height + variantRow.height / 2), catalog.i18nc("@tooltip", content)
-                    );
-                }
-                else
-                {
-                    base.hideTooltip();
-                }
-            }
-        }
-
         Item
         {
             id: materialVariantContainer

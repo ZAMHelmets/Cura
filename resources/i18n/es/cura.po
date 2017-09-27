@@ -2562,8 +2562,7 @@ msgstr "Solución completa para la impresión 3D de filamento fundido."
 
 #: /home/ruben/Projects/Cura/resources/qml/AboutDialog.qml:69
 msgctxt "@info:credit"
-msgid ""
-"BCN3D Cura is developed by BCN3D Technologies based on the open source project Cura developed by Ultimaker B.V. in cooperation with the community.\nBCN3D Cura uses the following open source projects:"
+msgid "BCN3D Cura is developed by BCN3D Technologies based on the open source project Cura developed by Ultimaker B.V. in cooperation with the community.\nBCN3D Cura uses the following open source projects:"
 msgstr "BCN3D Technologies ha desarrollado BCN3D Cura basado en el proyecto de código abierto Cura desarrolado por Ultimaker B.V. en cooperación con la comunidad.\nBCN3D Cura utiliza los siguientes proyectos de código abierto:"
 
 #: /home/ruben/Projects/Cura/resources/qml/AboutDialog.qml:118

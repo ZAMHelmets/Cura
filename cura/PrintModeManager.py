@@ -99,8 +99,7 @@ class PrintModeManager:
             if print_mode != "regular":
                 nodes = self._scene.getRoot().getChildren()
                 for node in nodes:
-                    if type(node) == SceneNode:
-                        self._setActiveExtruder(node)
+                    self._setActiveExtruder(node)
                 if self._old_material == "":
                     self._old_material = ExtruderManager.getInstance().getExtruderStack(1).material
                     material = ExtruderManager.getInstance().getExtruderStack(0).material
@@ -121,7 +120,10 @@ class PrintModeManager:
                 ExtruderManager.getInstance().getExtruderStack(1).setMaterial(container)
 
     def _setActiveExtruder(self, node):
-        node.callDecoration("setActiveExtruder", ExtruderManager.getInstance().getExtruderStack(0).getId())
+        if type(node) == SceneNode:
+            node.callDecoration("setActiveExtruder", ExtruderManager.getInstance().getExtruderStack(0).getId())
+            for child in node.getChildren():
+                self._setActiveExtruder(child)
 
     @classmethod
     def getInstance(cls) -> "PrintModeManager":

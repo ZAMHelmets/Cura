@@ -16,7 +16,7 @@
         "has_machine_materials": true,
         "has_variant_materials": true,
         "has_variants": true,
-        "preferred_material": "*Colorfila_PLA*",
+        "preferred_material": "*Colorfila_PLA_Pumpkin_Orange*",
         "preferred_variant": "*0.4mm_-_Brass*",
         "preferred_quality": "*Standard*",
         "variants_name": "Hotend",

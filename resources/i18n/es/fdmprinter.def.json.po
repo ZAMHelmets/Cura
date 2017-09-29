@@ -3843,7 +3843,7 @@ msgstr "Distancia entre la placa de rezumado y la impresión, en las direcciones
 #: fdmprinter.def.json
 msgctxt "smart_purge label"
 msgid "Smart Purge"
-msgstr "Purga inteligente"
+msgstr "Purga Inteligente"
 
 #: fdmprinter.def.json
 msgctxt "smart_purge description"
@@ -4760,7 +4760,7 @@ msgstr "Distancia que debe guardarse desde el borde del modelo. Si se alisa hast
 #: fdmprinter.def.json
 msgctxt "retract_reduction label"
 msgid "Reduce Retraction"
-msgstr "Reducir retracciones"
+msgstr "Reducir Retracciones"
 
 #: fdmprinter.def.json
 msgctxt "retract_reduction description"

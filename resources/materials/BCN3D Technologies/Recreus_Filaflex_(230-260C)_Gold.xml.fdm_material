@@ -6,7 +6,7 @@
             <material>Filaflex (230-260C)</material>
             <color>Gold</color>
         </name>
-        <GUID>094a6505-a394-11e7-be01-6451062ada2f</GUID>
+        <GUID>067ada23-a77b-11e7-bb6b-c62e5daeee41</GUID>
         <version>1</version>
         <color_code>#CB9D2D</color_code>
     </metadata>
@@ -20,46 +20,13 @@
 
         <machine>
            <machine_identifier manufacturer="BCN3D Technologies" product="bcn3dsigma" />
-           <hotend id="0.3mm - Brass">
-                <setting key="hardware compatible">yes</setting>
-           </hotend>
-           <hotend id="0.4mm - Brass">
-                <setting key="hardware compatible">yes</setting>
-           </hotend>
-           <hotend id="0.5mm - Hardened Steel">
-                <setting key="hardware compatible">yes</setting>
-           </hotend>
-           <hotend id="0.6mm - Brass">
-                <setting key="hardware compatible">yes</setting>
-           </hotend>
-           <hotend id="0.8mm - Brass">
-                <setting key="hardware compatible">yes</setting>
-           </hotend>
-           <hotend id="1.0mm - Brass">
-                <setting key="hardware compatible">yes</setting>
-           </hotend>
-        </machine>
-        <machine>
            <machine_identifier manufacturer="BCN3D Technologies" product="bcn3dsigmax" />
-           <hotend id="0.3mm - Brass">
-                <setting key="hardware compatible">yes</setting>
-           </hotend>
-           <hotend id="0.4mm - Brass">
-                <setting key="hardware compatible">yes</setting>
-           </hotend>
-           <hotend id="0.5mm - Hardened Steel">
-                <setting key="hardware compatible">yes</setting>
-           </hotend>
-           <hotend id="0.6mm - Brass">
-                <setting key="hardware compatible">yes</setting>
-           </hotend>
-           <hotend id="0.8mm - Brass">
-                <setting key="hardware compatible">yes</setting>
-           </hotend>
-           <hotend id="1.0mm - Brass">
-                <setting key="hardware compatible">yes</setting>
-           </hotend>
+           <hotend id="0.3mm - Brass" />
+           <hotend id="0.4mm - Brass" />
+           <hotend id="0.5mm - Hardened Steel" />
+           <hotend id="0.6mm - Brass" />
+           <hotend id="0.8mm - Brass" />
+           <hotend id="1.0mm - Brass" />
         </machine>
-
     </settings>
 </fdmmaterial>

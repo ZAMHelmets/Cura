@@ -42,9 +42,9 @@ shutil.rmtree("dist", True)
 
 setup(name="BCN3D Cura",
         version="15.09.80",
-        author="Ultimaker",
-        author_email="a.hiemstra@ultimaker.com",
-        url="http://software.ultimaker.com/",
+        author="BCN3D Technologies",
+        author_email="epardo@fundaciocim.org",
+        url="http://www.bcn3dtechnologies.com/en/3d-printer/bcn3d-cura",
         license="GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)",
         scripts=["cura_app.py"],
         windows=[{"script": "cura_app.py", "dest_name": "BCN3D_Cura", "icon_resources": [(1, "icons/cura.ico")]}],

@@ -25,7 +25,7 @@ UM.Dialog
         width: (base.minimumWidth * 0.85) | 0
         height: (width * (1/4.25)) | 0
 
-        source: UM.Theme.getImage("logo")
+        source: UM.Theme.getImage("logoBlack")
 
         sourceSize.width: width
         sourceSize.height: height
@@ -40,7 +40,7 @@ UM.Dialog
     {
         id: version
 
-        text: "Cura %1".arg(UM.Application.version)
+        text: "BCN3D Cura %1".arg(UM.Application.version)
         font: UM.Theme.getFont("large")
         anchors.right : logo.right
         anchors.top: logo.bottom

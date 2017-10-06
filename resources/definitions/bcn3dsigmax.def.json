@@ -31,7 +31,7 @@
     "overrides": {
         "machine_name": { "default_value": "Sigmax" },
         "machine_acceleration": { "default_value": 1750 },
-        "machine_max_jerk_xy": { "value": 15 },
+        "machine_max_jerk_xy": { "value": 12.5 },
         "machine_width": { "default_value": 420 },
         "print_mode": { "enabled": true },
         "wall_extruder_nr":

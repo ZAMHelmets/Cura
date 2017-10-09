@@ -38,7 +38,7 @@ class PostSlicing(QObject):
 
                     bcn3d_fixes_job = Bcn3DFixes(self._container, gcode_list)
                     bcn3d_fixes_job.finished.connect(self._onFinished)
-                    message = Message(catalog.i18nc("@info:postslice", "Modifying gcode"), progress=-1)
+                    message = Message(catalog.i18nc("@info:postslice", "Preparing gcode"), progress=-1)
                     message.show()
                     bcn3d_fixes_job.setMessage(message)
                     bcn3d_fixes_job.start()

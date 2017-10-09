@@ -25,11 +25,13 @@ class PostSlicing(QObject):
         if hasattr(scene, "gcode_list"):
             gcode_list = getattr(scene, "gcode_list")
             if gcode_list:
-                if print_mode_enabled:
+                if print_mode_enabled and ";MIRROR" not in gcode_list[0] and ";DUPLICATION" not in gcode_list[0]:
                     print_mode = self._container.getProperty("print_mode", "value")
                     if print_mode == "mirror":
-                        gcode_list[1] += "M605 S6 ;mirror mode enabled\n"
+                        gcode_list[0] += ";MIRROR\n"
+                        gcode_list[1] += "M605 S6 ;mirror mode enabled\nG4 P1\nG4 P2\nG4 P3\n"
                     elif print_mode == "duplication":
+                        gcode_list[0] += ";DUPLICATION\nG4 P1\nG4 P2\nG4 P3\n"
                         gcode_list[1] += "M605 S5 ;duplication mode enabled\n"
 
                 if ";BCN3D_FIXES" not in gcode_list[0] and auto_apply_fixes:

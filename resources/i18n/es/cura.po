@@ -3103,6 +3103,11 @@ msgctxt "@label:Printjob"
 msgid "Cancel"
 msgstr "Cancelar"
 
+#: SaveButton.qml
+msgctxt "@info:postslice"
+msgid "Modifying gcode"
+msgstr "Modificando gcode"
+
 #: /home/ruben/Projects/Cura/resources/qml/SaveButton.qml:288
 msgctxt "@info:tooltip"
 msgid "Select the active output device"

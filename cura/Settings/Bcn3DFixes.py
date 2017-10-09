@@ -141,19 +141,15 @@ class Bcn3DFixes(Job):
             # Fix hop
             for index, layer in enumerate(self._gcode_list):
                 # Fix strange travel to X105 Y297
-                regex = r"\n.*X" + str(int(self._container.getProperty("layer_start_x", "value") / 2.)) + " Y" + str(int(self._container.getProperty("layer_start_y", "value"))) + ".*"
-                self._gcode_list[index] = re.sub(regex, "", layer)
-                # re.sub(r"\n.*X11\.25 Y11\.25.*", "", layer)
+                regex = r"\n.*X" + str(int(self._container.getProperty("layer_start_x", "value"))) + " Y" + str(int(self._container.getProperty("layer_start_y", "value"))) + ".*"
+                layer = re.sub(regex, "", layer)
+                self._gcode_list[index] = layer
 
                 lines = layer.split("\n")
                 temp_index = 0
                 while temp_index < len(lines):
                     try:
                         line = lines[temp_index]
-                        # Fix strange travel to X105 Y297
-                        # if " X" + str(int(self._container.getProperty("layer_start_x", "value") / 2.)) + " Y" + str(int(self._container.getProperty("layer_start_y", "value"))) in line:
-                        #     del lines[temp_index]
-                        #     line = lines[temp_index]
                         line1 = lines[temp_index + 1]
                         line2 = lines[temp_index + 2]
                         line3 = lines[temp_index + 3]
@@ -472,15 +468,30 @@ class Bcn3DFixes(Job):
                                                             else:
                                                                 lineCount2 += 1
                                                         # Add purge commands
-                                                        xPosition = GCodeUtils.getValue(lines[temp_index - 1], "X")
-                                                        yPosition = GCodeUtils.getValue(lines[temp_index - 1], "Y")
-                                                        lines[temp_index] = lines[temp_index] + " ;prevent filament grinding on T" + \
-                                                                            str(countingForTool) + "\nG91\nG1 F12000 Z5\nG90\nG71\nG1 F2400 E" + \
-                                                                            str(round(eValue + purgeLength, 5)) + "\nG1 F" + \
-                                                                            str(GCodeUtils.getPurgeSpeed(lines, temp_index)) + " E" + \
-                                                                            str(round(eValue + 2 * purgeLength,5)) + "\nG4 P2000\nG1 F2400 E" + \
-                                                                            str(round(eValue + purgeLength, 5)) + "\nG92 E" + \
-                                                                            str(eValue) + "\nG72\G1 F12000 X"+str(xPosition)+" Y"+str(yPosition)+"\nG91\nG1 F12000 Z-5\nG90 ;end of the filament grinding prevention protocol"
+                                                        #todo remove when firmware updated
+                                                        if Application.getInstance().getMachineManager().activeMachineId == "Sigma":
+                                                            lines[temp_index] = lines[temp_index] + " ;prevent filament grinding on T" + \
+                                                                                str(countingForTool) + "\nT" + \
+                                                                                str(abs(countingForTool - 1)) + "\nT" + \
+                                                                                str(countingForTool) + "\nG91\nG1 F12000 Z2\nG90\nG1 F2400 E" + \
+                                                                                str(round(eValue + purgeLength, 5)) + "\nG1 F" + \
+                                                                                str(GCodeUtils.getPurgeSpeed(lines, temp_index)) + " E" + \
+                                                                                str(round(eValue + 2 * purgeLength, 5)) + "\nG4 P2000\nG1 F2400 E" + \
+                                                                                str(round(eValue + purgeLength, 5)) + "\nG92 E" + \
+                                                                                str(eValue) + "\nG0 F12000\n" + lines[temp_index + 1] + "\nG91\nG1 F12000 Z-2\nG90 ;end of the filament grinding prevention protocol"
+                                                        else:
+                                                            count_back = 1
+                                                            while not GCodeUtils.charsInLine("GXY", lines[temp_index - count_back]):
+                                                                count_back += 1
+                                                            xPosition = GCodeUtils.getValue(lines[temp_index - count_back], "X")
+                                                            yPosition = GCodeUtils.getValue(lines[temp_index - count_back], "Y")
+                                                            lines[temp_index] = lines[temp_index] + " ;prevent filament grinding on T" + \
+                                                                                str(countingForTool) + "\nG71\nG91\nG1 F12000 Z5\nG90\nG1 F2400 E" + \
+                                                                                str(round(eValue + purgeLength, 5)) + "\nG1 F" + \
+                                                                                str(GCodeUtils.getPurgeSpeed(lines, temp_index)) + " E" + \
+                                                                                str(round(eValue + 2 * purgeLength,5)) + "\nG4 P2000\nG1 F2400 E" + \
+                                                                                str(round(eValue + purgeLength, 5)) + "\nG92 E" + \
+                                                                                str(eValue) + "\nG1 F12000 X"+str(xPosition)+" Y"+str(yPosition)+"\nG91\nG1 F12000 Z-5\nG90 ;end of the filament grinding prevention protocol"
                                                         del lines[temp_index + 1]
                                                         temp_index -= 1
                                                         retractionsPerExtruder[countingForTool] = []

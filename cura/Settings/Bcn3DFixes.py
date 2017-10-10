@@ -16,20 +16,21 @@ class Bcn3DFixes(Job):
         
         extruder_left = ExtruderManager.getInstance().getExtruderStack(0)
         extruder_right = ExtruderManager.getInstance().getExtruderStack(1)
+        active_extruder = ExtruderManager.getInstance().getActiveExtruderStack()
 
-        self._activeExtruders = self._container.getProperty("active_extruders", "value")
-        self._fixToolChangeZHop = self._container.getProperty("fix_tool_change_retraction_hop", "value")
-        self._fixFirstRetract = self._container.getProperty("fix_first_retract", "value")
-        self._fixTemperatureOscilation = self._container.getProperty("fix_temperature_oscilation", "value")
-        self._zHopDistance = self._container.getProperty("retraction_hop_height_after_extruder_switch", "value")
-        self._smartPurge = self._container.getProperty("smart_purge", "value")
+        self._activeExtruders = active_extruder.getProperty("active_extruders", "value")
+        self._fixToolChangeZHop = active_extruder.getProperty("fix_tool_change_retraction_hop", "value")
+        self._fixFirstRetract = active_extruder.getProperty("fix_first_retract", "value")
+        self._fixTemperatureOscilation = active_extruder.getProperty("fix_temperature_oscilation", "value")
+        self._zHopDistance = active_extruder.getProperty("retraction_hop_height_after_extruder_switch", "value")
+        self._smartPurge = active_extruder.getProperty("smart_purge", "value")
         self._minimumExtrusion = [extruder_left.getProperty("minimum_extrusion", "value"),
                                   extruder_right.getProperty("minimum_extrusion", "value")]
         self._purgeLength = [extruder_left.getProperty("purge_length", "value"),
                              extruder_right.getProperty("purge_length", "value")]
-        self._retractReduction = self._container.getProperty("retract_reduction", "value")
+        self._retractReduction = active_extruder.getProperty("retract_reduction", "value")
 
-        self._avoidGrindingFilament = self._container.getProperty("avoid_grinding_filament", "value")
+        self._avoidGrindingFilament = active_extruder.getProperty("avoid_grinding_filament", "value")
         self._maxRetracts = [extruder_left.getProperty("max_retract", "value"),
                              extruder_right.getProperty("max_retract", "value")]
 

@@ -1891,6 +1891,7 @@
                     "type": "bool",
                     "default_value": true,
                     "enabled": false,
+                    "settable_per_extruder": false,
                     "comments": "bcn3d setting"
                 },
                 "max_retract":
@@ -1903,6 +1904,7 @@
                     "minimum_value_warning": "0",
                     "maximum_value_warning": "90",
                     "enabled": "avoid_grinding_filament",
+                    "settable_per_extruder": true,
                     "comments": "bcn3d setting"
                 },
                 "retraction_extrusion_window":
@@ -3089,6 +3091,7 @@
                     "minimum_value_warning": "0",
                     "maximum_value_warning": "5",
                     "enabled": "fix_tool_change_retraction_hop and retraction_hop_after_extruder_switch",
+                    "settable_per_extruder": false,
                     "comments": "bcn3d setting"
                 }
             }
@@ -5760,6 +5763,7 @@
                     "type": "bool",
                     "default_value": false,
                     "enabled": true,
+                    "settable_per_extruder": false,
                     "comments": "bcn3d setting"
                 }
             }
@@ -5827,6 +5831,7 @@
                     "type": "bool",
                     "default_value": false,
                     "value": "auto_apply_fixes and print_mode == 'regular'",
+                    "settable_per_extruder": false,
                     "enabled": false
                 },
                 "fix_first_retract": {
@@ -5835,6 +5840,7 @@
                     "type": "bool",
                     "default_value": false,
                     "value": "auto_apply_fixes",
+                    "settable_per_extruder": false,
                     "enabled": false
                 },
                 "fix_temperature_oscilation": {
@@ -5843,6 +5849,7 @@
                     "type": "bool",
                     "default_value": false,
                     "value": "auto_apply_fixes",
+                    "settable_per_extruder": false,
                     "enabled": false
                 },
                 "fix_tool_change_retraction_hop": {
@@ -5851,6 +5858,7 @@
                     "type": "bool",
                     "default_value": false,
                     "value": "auto_apply_fixes",
+                    "settable_per_extruder": false,
                     "enabled": false
                 }
             }

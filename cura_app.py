@@ -56,11 +56,11 @@ import cura.Settings.CuraContainerRegistry
 
 def get_cura_dir_path():
     if Platform.isWindows():
-        return os.path.expanduser("~/AppData/Local/cura/")
+        return os.path.expanduser("~/AppData/Local/BCN3D Cura/")
     elif Platform.isLinux():
-        return os.path.expanduser("~/.local/share/cura")
+        return os.path.expanduser("~/.local/share/BCN3D Cura")
     elif Platform.isOSX():
-        return os.path.expanduser("~/Library/Logs/cura")
+        return os.path.expanduser("~/Library/Logs/BCN3D Cura")
 
 if hasattr(sys, "frozen"):
     dirpath = get_cura_dir_path()

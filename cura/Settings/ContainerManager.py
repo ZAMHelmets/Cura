@@ -789,7 +789,7 @@ class ContainerManager(QObject):
             return ""
 
         approximate_diameter = str(round(global_stack.getProperty("material_diameter", "value")))
-        containers = self._container_registry.findInstanceContainers(id = "generic_pla*", approximate_diameter = approximate_diameter)
+        containers = self._container_registry.findInstanceContainers(id = "BCN3D_Filaments_PLA_Pumpkin_Orange", approximate_diameter = approximate_diameter)
         if not containers:
             Logger.log("d", "Unable to create a new material by cloning Generic PLA, because it cannot be found for the material diameter for this machine.")
             return ""
@@ -843,7 +843,7 @@ class ContainerManager(QObject):
                 return materials[0].getId()
 
             Logger.log("w", "Unable to find a suitable container based on %s for the current machine .", base_file)
-            return "" # do not activate a new material if a container can not be found
+        #     return "" # do not activate a new material if a container can not be found
 
         return base_file
 

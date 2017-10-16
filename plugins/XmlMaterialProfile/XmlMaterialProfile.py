@@ -459,7 +459,7 @@ class XmlMaterialProfile(InstanceContainer):
                 if label is not None:
                     self._name = label.text
                 else:
-                    self._name = self._profile_name(material.text, color.text)
+                    self._name = self._profile_name(color.text, material.text)
                 meta_data["brand"] = brand.text
                 meta_data["material"] = material.text
                 meta_data["color_name"] = color.text

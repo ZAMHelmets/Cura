@@ -114,6 +114,9 @@
             "enabled": "print_mode == 'regular'",
             "value": "False if print_mode != 'regular' else True"
         },
-        "avoid_grinding_filament": { "value": false }
+        "avoid_grinding_filament": {
+            "enabled": "print_mode != 'duplication'",
+            "value": false
+        }
     }
 }

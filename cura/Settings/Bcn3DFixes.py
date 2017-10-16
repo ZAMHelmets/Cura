@@ -151,6 +151,8 @@ class Bcn3DFixes(Job):
                 while temp_index < len(lines):
                     try:
                         line = lines[temp_index]
+                        if GCodeUtils.charsInLine(["G0", "X", "Y", "Z"], line):
+                            zValue = GCodeUtils.getValue(line, "Z")
                         line1 = lines[temp_index + 1]
                         line2 = lines[temp_index + 2]
                         line3 = lines[temp_index + 3]
@@ -161,8 +163,6 @@ class Bcn3DFixes(Job):
                             while not lines[temp_index + lineCount].startswith(";TYPE"):
                                 line = lines[temp_index + lineCount]
                                 if line.startswith("G"):
-                                    if GCodeUtils.charsInLine(["G0", "X", "Y", "Z"], line):
-                                        zValue = GCodeUtils.getValue(line, "Z")
                                     if lines[temp_index + lineCount + 1].startswith("G"):
                                         del lines[temp_index + lineCount]
                                         lineCount -= 1

@@ -34,8 +34,8 @@ class PostSlicing(QObject):
                         gcode_list[0] += ";MIRROR\n"
                         gcode_list[1] += "M605 S6 ;mirror mode enabled\nG4 P1\nG4 P2\nG4 P3\n"
                     elif print_mode == "duplication":
-                        gcode_list[0] += ";DUPLICATION\nG4 P1\nG4 P2\nG4 P3\n"
-                        gcode_list[1] += "M605 S5 ;duplication mode enabled\n"
+                        gcode_list[0] += ";DUPLICATION\n"
+                        gcode_list[1] += "M605 S5 ;duplication mode enabled\nG4 P1\nG4 P2\nG4 P3\n"
 
                 if ";BCN3D_FIXES" not in gcode_list[0] and auto_apply_fixes:
                     self._bcn3d_fixes_job = Bcn3DFixes(container, gcode_list)

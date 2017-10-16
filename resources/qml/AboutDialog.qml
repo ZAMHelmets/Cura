@@ -134,7 +134,7 @@ UM.Dialog
                 projectsModel.append({ name:"python-zeroconf", description: catalog.i18nc("@label", "ZeroConf discovery library"), license: "LGPL", url: "https://github.com/jstasiak/python-zeroconf" });
                 projectsModel.append({ name:"Clipper", description: catalog.i18nc("@label", "Polygon clipping library"), license: "Boost", url: "http://www.angusj.com/delphi/clipper.php" });
 
-                projectsModel.append({ name:"Open Sans", description: catalog.i18nc("@label", "Font"), license: "Apache 2.0", url: "https://fonts.google.com/specimen/Open+Sans" });
+                projectsModel.append({ name:"Montserrat", description: catalog.i18nc("@label", "Font"), license: "SIL OFL 1.1", url: "https://fonts.google.com/specimen/Montserrat" });
                 projectsModel.append({ name:"Font-Awesome-SVG-PNG", description: catalog.i18nc("@label", "SVG icons"), license: "SIL OFL 1.1", url: "https://github.com/encharm/Font-Awesome-SVG-PNG" });
             }
         }

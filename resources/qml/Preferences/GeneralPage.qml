@@ -622,12 +622,12 @@ UM.PreferencesPage
                 width: UM.Theme.getSize("default_margin").height
             }
 
-            Label
-            {
-                font.bold: true
-                visible: checkUpdatesCheckbox.visible || sendDataCheckbox.visible
-                text: catalog.i18nc("@label","Privacy")
-            }
+//            Label
+//            {
+//                font.bold: true
+//                visible: checkUpdatesCheckbox.visible || sendDataCheckbox.visible
+//                text: catalog.i18nc("@label","Privacy")
+//            }
 
 //            UM.TooltipArea {
 //                visible: plugins.find("id", "UpdateChecker") > -1

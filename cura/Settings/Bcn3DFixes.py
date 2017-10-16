@@ -201,7 +201,7 @@ class Bcn3DFixes(Job):
                                     eValue = GCodeUtils.getValue(line, "E")
                                 lineCount += 1
                         # Fix the thing
-                        elif layer.startswith(";LAYER:0"):
+                        elif layer.startswith(";LAYER:"):
                             line1 = lines[temp_index + 1]
                             line2 = lines[temp_index + 2]
                             line3 = lines[temp_index + 3]

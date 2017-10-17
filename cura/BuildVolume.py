@@ -1,7 +1,6 @@
 # Copyright (c) 2016 Ultimaker B.V.
 # Cura is released under the terms of the AGPLv3 or higher.
 
-from cura.DuplicatedNode import DuplicatedNode
 from cura.PrintModeManager import PrintModeManager
 from cura.Settings.ExtruderManager import ExtruderManager
 

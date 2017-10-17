@@ -1,6 +1,8 @@
 # Copyright (c) 2017 Ultimaker B.V.
 # Cura is released under the terms of the AGPLv3 or higher.
 
+import math
+
 from PyQt5.QtCore import QObject, QUrl
 from PyQt5.QtGui import QDesktopServices
 from UM.FlameProfiler import pyqtSlot
@@ -55,8 +57,19 @@ class CuraActions(QObject):
             current_node = node
             while current_node.getParent() and current_node.getParent().callDecoration("isGroup"):
                 current_node = current_node.getParent()
-
-            center_operation = SetTransformOperation(current_node, Vector())
+            vector = Vector()
+            print_mode_enabled = Application.getInstance().getGlobalContainerStack().getProperty("print_mode", "enabled")
+            if print_mode_enabled:
+                print_mode = Application.getInstance().getGlobalContainerStack().getProperty("print_mode", "value")
+                if print_mode != "regular":
+                    machine_width = Application.getInstance().getGlobalContainerStack().getProperty("machine_width", "value")
+                    center = -machine_width/4
+                    if print_mode == "mirror":
+                        machine_head_with_fans_polygon = Application.getInstance().getGlobalContainerStack().getProperty("machine_head_with_fans_polygon", "value")
+                        machine_head_size = math.fabs(machine_head_with_fans_polygon[0][0] - machine_head_with_fans_polygon[2][0])
+                        center -= machine_head_size/4
+                    vector = Vector(center, 0, 0)
+            center_operation = SetTransformOperation(current_node, vector)
             operation.addOperation(center_operation)
         operation.push()
 

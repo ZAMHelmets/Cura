@@ -1674,8 +1674,8 @@ msgstr "Realizar una purga en el cajetín para renovar la parte del hilo en cont
 
 #: fdmprinter.def.json
 msgctxt "max_retract label"
-msgid "Max. Retraction Count"
-msgstr "Max. núm. retracciones"
+msgid "Maximum Retraction Count"
+msgstr "Recuento máximo de retracciones"
 
 #: fdmprinter.def.json
 msgctxt "max_retract description"

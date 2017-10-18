@@ -459,7 +459,7 @@ class XmlMaterialProfile(InstanceContainer):
                 if label is not None:
                     self._name = label.text
                 else:
-                    self._name = self._profile_name(color.text, material.text)
+                    self._name = self._profile_name(material.text, color.text)
                 meta_data["brand"] = brand.text
                 meta_data["material"] = material.text
                 meta_data["color_name"] = color.text
@@ -646,7 +646,7 @@ class XmlMaterialProfile(InstanceContainer):
 
     def _profile_name(self, material_name, color_name):
         if color_name != "Generic":
-            return "%s %s" % (color_name, material_name)
+            return "%s %s" % (material_name, color_name)
         else:
             return material_name
 

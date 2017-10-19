@@ -457,8 +457,7 @@ class Bcn3DFixes(Job):
                                             if eValue < GCodeUtils.getValue(line, "E"):
                                                 purgeLength = round(GCodeUtils.getValue(line, "E") - eValue, 5)
                                                 retractionsPerExtruder[countingForTool].append(eValue)
-                                                if len(retractionsPerExtruder[countingForTool]) > self._maxRetracts[
-                                                    countingForTool]:
+                                                if len(retractionsPerExtruder[countingForTool]) > self._maxRetracts[countingForTool]:
                                                     if (retractionsPerExtruder[countingForTool][-1] - retractionsPerExtruder[countingForTool][0]) < purgeLength:
                                                         # Delete extra travels
                                                         lineCount2 = temp_index + 1

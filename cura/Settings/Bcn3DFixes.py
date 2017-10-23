@@ -141,11 +141,6 @@ class Bcn3DFixes(Job):
             self._startGcodeInfo.append("; - Fix Tool Change Z Hop")
             # Fix hop
             for index, layer in enumerate(self._gcode_list):
-                # Fix strange travel to X105 Y297
-                regex = r"\n.*X" + str(int(self._container.getProperty("layer_start_x", "value"))) + " Y" + str(int(self._container.getProperty("layer_start_y", "value"))) + ".*"
-                layer = re.sub(regex, "", layer)
-                self._gcode_list[index] = layer
-
                 lines = layer.split("\n")
                 temp_index = 0
                 while temp_index < len(lines):
@@ -176,6 +171,9 @@ class Bcn3DFixes(Job):
                     except:
                         break
                 layer = "\n".join(lines)
+                # Fix strange travel to X105 Y297
+                regex = r"\n.*X" + str(int(self._container.getProperty("layer_start_x", "value"))) + " Y" + str(int(self._container.getProperty("layer_start_y", "value"))) + ".*"
+                layer = re.sub(regex, "", layer)
                 self._gcode_list[index] = layer
             Logger.log("d", "fix_tool_change_z_hop applied")
                 

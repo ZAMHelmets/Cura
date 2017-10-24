@@ -393,13 +393,17 @@ class MachineManager(QObject):
         if not self._global_container_stack:
             return False
 
-        if self._global_container_stack.getTop().findInstances():
-            return True
-
         stacks = list(ExtruderManager.getInstance().getMachineExtruders(self._global_container_stack.getId()))
         for stack in stacks:
             if stack.getTop().findInstances():
                 return True
+
+        instances = self._global_container_stack.getTop().findInstances()
+        if instances:
+            if len(instances) == 1 and instances[0].definition.key == "print_mode":
+                return False
+            return True
+
 
         return False
 

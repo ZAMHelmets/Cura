@@ -20,6 +20,28 @@ class PrintModeManager:
         self._duplicated_nodes = []
         self._scene = Application.getInstance().getController().getScene()
 
+        #Settings which value needs to be handled when changing print_mode
+        self._conflict_settings = {
+            'wall_extruder_nr': '-1',
+            'wall_0_extruder_nr': '-1',
+            'wall_x_extruder_nr': '-1',
+            'roofing_extruder_nr': '-1',
+            'top_bottom_extruder_nr': '-1',
+            'infill_extruder_nr': '-1',
+            'support_extruder_nr': '0',
+            'support_infill_extruder_nr': '0',
+            'support_extruder_nr_layer_0': '0',
+            'support_interface_extruder_nr': '0',
+            'support_roof_extruder_nr': '0',
+            'support_bottom_extruder_nr': '0',
+            'adhesion_extruder_nr': '0',
+            'prime_tower_enable': False,
+            'ooze_shield_enabled': False,
+            'carve_multiple_volumes': False,
+            'smart_purge': False,
+            'retraction_max_count': 1000
+        }
+
         old_material_id = Preferences.getInstance().getValue("cura/old_material")
         if Application.getInstance().getContainerRegistry().findContainers(id=old_material_id):
             self._old_material = Application.getInstance().getContainerRegistry().findContainers(id=old_material_id)[0]
@@ -97,6 +119,7 @@ class PrintModeManager:
         if self._global_stack:
             print_mode = self._global_stack.getProperty("print_mode", "value")
             if print_mode != "regular":
+                self._handleSettingsValue()
                 nodes = self._scene.getRoot().getChildren()
                 for node in nodes:
                     self._setActiveExtruder(node)
@@ -107,6 +130,7 @@ class PrintModeManager:
                     Preferences.getInstance().setValue("cura/old_material", self._old_material.getId())
                 self.renderDuplicatedNodes()
             else:
+                self._restoreSettingsValue()
                 self.removeDuplicatedNodes()
                 if self._old_material != "":
                     ExtruderManager.getInstance().getExtruderStack(1).setMaterial(self._old_material)
@@ -124,6 +148,14 @@ class PrintModeManager:
             node.callDecoration("setActiveExtruder", ExtruderManager.getInstance().getExtruderStack(0).getId())
             for child in node.getChildren():
                 self._setActiveExtruder(child)
+
+    def _handleSettingsValue(self):
+        for key, value in self._conflict_settings.items():
+            self._global_stack.setProperty(key, "value", value)
+
+    def _restoreSettingsValue(self):
+        for key in self._conflict_settings.keys():
+            Application.getInstance().getMachineManager().clearUserSettingAllCurrentStacks(key)
 
     @classmethod
     def getInstance(cls) -> "PrintModeManager":

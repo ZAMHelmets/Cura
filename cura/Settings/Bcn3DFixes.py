@@ -22,19 +22,43 @@ class Bcn3DFixes(Job):
         self._fixToolChangeZHop = active_extruder.getProperty("fix_tool_change_retraction_hop", "value")
         self._fixFirstRetract = active_extruder.getProperty("fix_first_retract", "value")
         self._fixTemperatureOscilation = active_extruder.getProperty("fix_temperature_oscilation", "value")
-        self._zHopDistance = active_extruder.getProperty("retraction_hop_height_after_extruder_switch", "value")
-        self._smartPurge = active_extruder.getProperty("smart_purge", "value")
+        self._retractionHopHeightAfterExtruderSwitch = [extruder_left.getProperty("retraction_hop_height_after_extruder_switch", "value"),
+                                                        extruder_right.getProperty("retraction_hop_height_after_extruder_switch", "value")]
+        self._smartPurge = [extruder_left.getProperty("smart_purge", "value"),
+                            extruder_right.getProperty("smart_purge", "value")]
         self._minimumExtrusion = [extruder_left.getProperty("minimum_extrusion", "value"),
                                   extruder_right.getProperty("minimum_extrusion", "value")]
         self._purgeLength = [extruder_left.getProperty("purge_length", "value"),
                              extruder_right.getProperty("purge_length", "value")]
         self._retractReduction = active_extruder.getProperty("retract_reduction", "value")
-
-        self._avoidGrindingFilament = active_extruder.getProperty("avoid_grinding_filament", "value")
+        self._avoidGrindingFilament = [extruder_left.getProperty("avoid_grinding_filament", "value"),
+                                       extruder_right.getProperty("avoid_grinding_filament", "value")]
         self._maxRetracts = [extruder_left.getProperty("max_retract", "value"),
                              extruder_right.getProperty("max_retract", "value")]
 
+        self._switchExtruderRetractionAmount = [extruder_left.getProperty("switch_extruder_retraction_amount", "value"),
+                                                extruder_right.getProperty("switch_extruder_retraction_amount", "value")]
+        self._retractionAmount = [extruder_left.getProperty("retraction_amount", "value"),
+                                  extruder_right.getProperty("retraction_amount", "value")]
+        self._retractionExtrusionWindow = [extruder_left.getProperty("retraction_extrusion_window", "value"),
+                                          extruder_right.getProperty("retraction_extrusion_window", "value")]
+
+        #Speeds
+        self._travelSpeed = [str(int(extruder_left.getProperty("speed_travel", "value")*60)),
+                             str(int(extruder_right.getProperty("speed_travel", "value") * 60))]
+        self._retractionRetractSpeed = [str(int(extruder_left.getProperty("retraction_retract_speed", "value") * 60)),
+                                        str(int(extruder_right.getProperty("retraction_retract_speed", "value") * 60))]
+        self._retractionPrimeSpeed = [str(int(extruder_left.getProperty("retraction_prime_speed", "value")*60)),
+                                      str(int(extruder_right.getProperty("retraction_prime_speed", "value")*60))]
+        self._switchExtruderRetractionSpeed = [str(int(extruder_left.getProperty("switch_extruder_retraction_speed", "value") * 60)),
+                                               str(int(extruder_right.getProperty("switch_extruder_retraction_speed", "value") * 60))]
+        self._switchExtruderPrimeSpeed = [str(int(extruder_left.getProperty("switch_extruder_prime_speed", "value")*60)),
+                                          str(int(extruder_right.getProperty("switch_extruder_prime_speed", "value")*60))]
+
         self._startGcodeInfo = [";BCN3D Fixes applied"]
+
+        self._both_extruders = False
+        self._idle_extruder = "T1"
 
         self._message = None
         self.progress.connect(self._onProgress)
@@ -44,10 +68,8 @@ class Bcn3DFixes(Job):
         Job.yieldThread()
         # Do not change actions order as some may alter others
         if self._activeExtruders or self._fixTemperatureOscilation or self._fixFirstRetract:
-            self._both_extruders = False
             scanning = False
             printing = False
-            self._idle_extruder = "T1"
             for layer in self._gcode_list:
                 lines = layer.split("\n")
                 for line in lines:
@@ -153,7 +175,11 @@ class Bcn3DFixes(Job):
                         line3 = lines[temp_index + 3]
                         line4 = lines[temp_index + 4]
                         if (line == "T0" or line == "T1") and line1 == "G92 E0" and line2 == "G91" and "G1 F" in line3 and line4 == "G90":
-                            lines[temp_index + 3] = line3.split("Z")[0] + "Z" + str(self._zHopDistance)
+                            if line == "T0":
+                                countingForTool = 0
+                            else:
+                                countingForTool = 1
+                            lines[temp_index + 3] = line3.split("Z")[0] + "Z" + str(self._retractionHopHeightAfterExtruderSwitch[countingForTool])
                             lineCount = 6  # According to extruder_start_gcode in Sigma Extruders definitions
                             while not lines[temp_index + lineCount].startswith(";TYPE"):
                                 line = lines[temp_index + lineCount]
@@ -164,7 +190,7 @@ class Bcn3DFixes(Job):
                                     else:
                                         xValue = GCodeUtils.getValue(line, "X")
                                         yValue = GCodeUtils.getValue(line, "Y")
-                                        lines[temp_index + lineCount] = "G0 F12000 X" + str(xValue) + " Y" + str(yValue) + "\nG0 Z" + str(zValue)
+                                        lines[temp_index + lineCount] = "G0 F" + self._travelSpeed[countingForTool] + " X" + str(xValue) + " Y" + str(yValue) + "\nG0 Z" + str(zValue)
                                 lineCount += 1
                             break
                         temp_index += 1
@@ -216,7 +242,7 @@ class Bcn3DFixes(Job):
                                 while not lines[temp_index + lineCount].startswith(";TYPE"):
                                     line = lines[temp_index + lineCount]
                                     if GCodeUtils.charsInLine(["G0", "F", "X", "Y"], line):
-                                        primeCommandLine = "G1 F2400 E0\nG92 E0 ; T0fix"
+                                        primeCommandLine = "G1 F" + self._retractionPrimeSpeed[0] + " E0\nG92 E0 ; T0fix"
                                         lines[temp_index + lineCount + 1] = lines[temp_index + lineCount + 1] + "\n" + primeCommandLine + "\n"
                                         if self._both_extruders:
                                             fixExtruder = "T1"
@@ -232,7 +258,7 @@ class Bcn3DFixes(Job):
                                     if GCodeUtils.charsInLine(["G0", "F", "X", "Y"], line):
                                         if GCodeUtils.charsInLine(["G1 F", " E"], lines[temp_index + lineCount + 1]):
                                             del lines[temp_index + lineCount + 1]
-                                        primeCommandLine = "G1 F2400 E" + str(abs(eValue)) + "\nG92 E0 ; T1fix"
+                                        primeCommandLine = "G1 F" + self._retractionPrimeSpeed[1] + " E" + str(abs(eValue)) + "\nG92 E0 ; T1fix"
                                         lines[temp_index + lineCount + 1] = lines[temp_index + lineCount + 1] + "\n" + primeCommandLine + "\n"
                                         break
                                     lineCount += 1
@@ -247,15 +273,14 @@ class Bcn3DFixes(Job):
             Logger.log("d", "fix_retract applied")
 
     def _handleSmartPurge(self):
-        if self._smartPurge and self._both_extruders:
+        if (self._smartPurge[0] or self._smartPurge[1]) and self._both_extruders:
             self._startGcodeInfo.append("; - Smart Purge")
             extraPurges = []
             for index, layer in enumerate(self._gcode_list):
                 lines = layer.split("\n")
                 temp_index = 0
                 while temp_index < len(lines):
-                    if not layer.startswith(";LAYER:0") and layer.startswith(";LAYER:") and (
-                                lines[temp_index].startswith("T0") or lines[temp_index].startswith("T1")):
+                    if not layer.startswith(";LAYER:0") and layer.startswith(";LAYER:") and (lines[temp_index].startswith("T0") or lines[temp_index].startswith("T1")):
                         if lines[temp_index].startswith("T0"):
                             countingForTool = 0
                         elif lines[temp_index].startswith("T1"):
@@ -263,9 +288,7 @@ class Bcn3DFixes(Job):
                         lineCount = temp_index - 1
                         while lineCount >= 0:
                             line = lines[lineCount]
-                            if GCodeUtils.charsInLine("GFE", line) and GCodeUtils.getValue(line, "E") < \
-                                    self._minimumExtrusion[
-                                        abs(countingForTool - 1)]:
+                            if self._smartPurge[countingForTool] and GCodeUtils.charsInLine("GFE", line) and GCodeUtils.getValue(line, "E") < self._minimumExtrusion[abs(countingForTool - 1)]:
                                 extraPurges.append(index - 1)
                                 break
                             lineCount -= 1
@@ -292,10 +315,10 @@ class Bcn3DFixes(Job):
                                         lineCount = temp_index
                                         break
                                 lines[temp_index] = lines[temp_index] + "\nM104 S" + str(
-                                    GCodeUtils.getValue(lines[lineCount], "S")) + "\nG1 F2400 E" + str(
-                                    8) + "\nG1 F" + str(GCodeUtils.getPurgeSpeed(lines, temp_index)) + " E" + str(
-                                    8 + self._purgeLength[countingForTool]) + "\nG4 P2000\nG1 F2400 E" + str(
-                                    self._purgeLength[countingForTool]) + "\nG92 E0"
+                                    GCodeUtils.getValue(lines[lineCount], "S")) + "\nG1 F" + self._switchExtruderPrimeSpeed[countingForTool] + " E" + \
+                                                    str(self._switchExtruderRetractionAmount[countingForTool]) + "\nG1 F" + str(GCodeUtils.getPurgeSpeed(lines, temp_index)) + " E" + \
+                                                    str(self._switchExtruderRetractionAmount[countingForTool] + self._purgeLength[countingForTool]) + "\nG4 P2000\nG1 F" + self._retractionRetractSpeed[countingForTool] + " E" + \
+                                                    str(self._retractionAmount[countingForTool]) + "\nG92 E0"
                                 break
                             temp_index += 1
                         del extraPurges[0]
@@ -430,7 +453,7 @@ class Bcn3DFixes(Job):
             Logger.log("d", "retract_reduction applied")
                 
     def _handleAvoidGrindingFilament(self):
-        if self._avoidGrindingFilament:
+        if self._avoidGrindingFilament[0] or self._avoidGrindingFilament[1]:
             self._startGcodeInfo.append("; - Prevent Filament Grinding")
             retractionsPerExtruder = [[], []]
             countingForTool = 0
@@ -452,8 +475,8 @@ class Bcn3DFixes(Job):
                                     while lineCount >= 0:
                                         line = lines[lineCount]
                                         if " E" in line and "G92" not in line:
-                                            if eValue < GCodeUtils.getValue(line, "E"):
-                                                purgeLength = round(GCodeUtils.getValue(line, "E") - eValue, 5)
+                                            if eValue < GCodeUtils.getValue(line, "E") and self._avoidGrindingFilament[countingForTool]:
+                                                purgeLength = self._retractionExtrusionWindow[countingForTool]
                                                 retractionsPerExtruder[countingForTool].append(eValue)
                                                 if len(retractionsPerExtruder[countingForTool]) > self._maxRetracts[countingForTool]:
                                                     if (retractionsPerExtruder[countingForTool][-1] - retractionsPerExtruder[countingForTool][0]) < purgeLength:
@@ -465,30 +488,32 @@ class Bcn3DFixes(Job):
                                                             else:
                                                                 lineCount2 += 1
                                                         # Add purge commands
+                                                        count_back = 1
+                                                        while not GCodeUtils.charsInLine("GXY", lines[temp_index - count_back]):
+                                                            count_back += 1
+                                                        xPosition = GCodeUtils.getValue(lines[temp_index - count_back], "X")
+                                                        yPosition = GCodeUtils.getValue(lines[temp_index - count_back], "Y")
                                                         #todo remove when firmware updated
                                                         if Application.getInstance().getMachineManager().activeMachineId == "Sigma":
                                                             lines[temp_index] = lines[temp_index] + " ;prevent filament grinding on T" + \
-                                                                                str(countingForTool) + "\nT" + \
+                                                                                str(countingForTool) + "\nG1 F" + self._travelSpeed[countingForTool] + "\nT" + \
                                                                                 str(abs(countingForTool - 1)) + "\nT" + \
-                                                                                str(countingForTool) + "\nG91\nG1 F12000 Z2\nG90\nG1 F2400 E" + \
+                                                                                str(countingForTool) + "\nG91\nG1 F" + self._travelSpeed[countingForTool] + " Z" + str(self._retractionHopHeightAfterExtruderSwitch[countingForTool]) + "\nG90\nG1 F" + self._retractionPrimeSpeed[countingForTool] + " E" + \
                                                                                 str(round(eValue + purgeLength, 5)) + "\nG1 F" + \
                                                                                 str(GCodeUtils.getPurgeSpeed(lines, temp_index)) + " E" + \
-                                                                                str(round(eValue + 2 * purgeLength, 5)) + "\nG4 P2000\nG1 F2400 E" + \
+                                                                                str(round(eValue + 2 * purgeLength, 5)) + "\nG4 P2000\nG1 F" + self._retractionRetractSpeed[countingForTool] + " E" + \
                                                                                 str(round(eValue + purgeLength, 5)) + "\nG92 E" + \
-                                                                                str(eValue) + "\nG0 F12000\n" + lines[temp_index + 1] + "\nG91\nG1 F12000 Z-2\nG90 ;end of the filament grinding prevention protocol"
+                                                                                str(eValue) + "\nG1 F" + self._travelSpeed[countingForTool] + " X" + \
+                                                                                str(xPosition)+" Y" + str(yPosition)+"\nG91\nG1 F" + self._travelSpeed[countingForTool] + " Z-" + str(self._retractionHopHeightAfterExtruderSwitch[countingForTool]) + "\nG90 ;end of the filament grinding prevention protocol"
                                                         else:
-                                                            count_back = 1
-                                                            while not GCodeUtils.charsInLine("GXY", lines[temp_index - count_back]):
-                                                                count_back += 1
-                                                            xPosition = GCodeUtils.getValue(lines[temp_index - count_back], "X")
-                                                            yPosition = GCodeUtils.getValue(lines[temp_index - count_back], "Y")
                                                             lines[temp_index] = lines[temp_index] + " ;prevent filament grinding on T" + \
-                                                                                str(countingForTool) + "\nG71\nG91\nG1 F12000 Z5\nG90\nG1 F2400 E" + \
+                                                                                str(countingForTool) + "\nG1 F" + self._travelSpeed[countingForTool] + "\nG71\nG91\nG1 F" + self._travelSpeed[countingForTool] + " Z" + str(self._retractionHopHeightAfterExtruderSwitch[countingForTool]) + "\nG90\nG1 F" + self._retractionPrimeSpeed[countingForTool] + " E" + \
                                                                                 str(round(eValue + purgeLength, 5)) + "\nG1 F" + \
                                                                                 str(GCodeUtils.getPurgeSpeed(lines, temp_index)) + " E" + \
-                                                                                str(round(eValue + 2 * purgeLength,5)) + "\nG4 P2000\nG1 F2400 E" + \
+                                                                                str(round(eValue + 2 * purgeLength,5)) + "\nG4 P2000\nG1 F" + self._retractionRetractSpeed[countingForTool] + " E" + \
                                                                                 str(round(eValue + purgeLength, 5)) + "\nG92 E" + \
-                                                                                str(eValue) + "\nG1 F12000 X"+str(xPosition)+" Y"+str(yPosition)+"\nG91\nG1 F12000 Z-5\nG90 ;end of the filament grinding prevention protocol"
+                                                                                str(eValue) + "\nG1 F" + self._travelSpeed[countingForTool] + "\nG72\nG1 F" + self._travelSpeed[countingForTool] + " X" + \
+                                                                                str(xPosition)+" Y" + str(yPosition)+"\nG91\nG1 F" + self._travelSpeed[countingForTool] + " Z-" + str(self._retractionHopHeightAfterExtruderSwitch[countingForTool]) + "\nG90 ;end of the filament grinding prevention protocol"
                                                         del lines[temp_index + 1]
                                                         temp_index -= 1
                                                         retractionsPerExtruder[countingForTool] = []

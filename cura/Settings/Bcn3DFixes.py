@@ -444,6 +444,7 @@ class Bcn3DFixes(Job):
             self._startGcodeInfo.append("; - Prevent Filament Grinding")
             retractionsPerExtruder = [[], []]
             countingForTool = 0
+            purgedOffset = [0, 0]
             for index, layer in enumerate(self._gcode_list):
                 lines = layer.split("\n")
                 temp_index = 0
@@ -452,8 +453,12 @@ class Bcn3DFixes(Job):
                         line = lines[temp_index]
                         if line.startswith("T0"):
                             countingForTool = 0
+                            if not layer.startswith(";LAYER:0") and self._smartPurge[countingForTool]:
+                                purgedOffset[countingForTool] += self._smartPurgePParameter[countingForTool]
                         elif line.startswith("T1"):
                             countingForTool = 1
+                            if not layer.startswith(";LAYER:0") and self._smartPurge[countingForTool]:
+                                purgedOffset[countingForTool] += self._smartPurgePParameter[countingForTool]
                         elif " E" in line and "G92" not in line:
                             eValue = GCodeUtils.getValue(line, "E")
                             lineCount = temp_index - 1
@@ -466,7 +471,7 @@ class Bcn3DFixes(Job):
                                                 purgeLength = self._retractionExtrusionWindow[countingForTool]
                                                 retractionsPerExtruder[countingForTool].append(eValue)
                                                 if len(retractionsPerExtruder[countingForTool]) > self._maxRetracts[countingForTool]:
-                                                    if (retractionsPerExtruder[countingForTool][-1] - retractionsPerExtruder[countingForTool][0]) < purgeLength:
+                                                    if (retractionsPerExtruder[countingForTool][-1] - retractionsPerExtruder[countingForTool][0]) < purgeLength + purgedOffset[countingForTool]:
                                                         # Delete extra travels
                                                         lineCount2 = temp_index + 1
                                                         while lines[lineCount2].startswith("G0"):
@@ -504,6 +509,9 @@ class Bcn3DFixes(Job):
                                                         del lines[temp_index + 1]
                                                         temp_index -= 1
                                                         retractionsPerExtruder[countingForTool] = []
+                                                        purgedOffset[countingForTool] = 0
+                                                        while (retractionsPerExtruder[countingForTool][-1] - retractionsPerExtruder[countingForTool][0]) > purgeLength:
+                                                            del retractionsPerExtruder[countingForTool][0]
                                                     else:
                                                         del retractionsPerExtruder[countingForTool][0]
                                             break

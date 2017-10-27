@@ -4705,10 +4705,10 @@
                     "settable_per_extruder": true,
                     "comments": "bcn3d setting"
                 },
-                "minimum_extrusion":
+                "smart_purge_slope":
                 {
-                    "label": "Minimum Extrusion",
-                    "description": "Minimum filament length to be extruded in the layer to avoid purge.",
+                    "label": "Distance Gradient",
+                    "description": "Distance to purge per second idle. Purged distance will increase this amount each second the toolhead remains idle. If the final distance is shorter than the Minimum Purge Distance it will be increased to this value the ensure the right Hotend's pressure. If the final distance is greater than the Maximum Purge Distance it will be decreased to this value to avoid purge tray filling.",
                     "unit": "mm",
                     "type": "float",
                     "default_value": 1.5,
@@ -4719,10 +4719,24 @@
                     "settable_per_extruder": true,
                     "comments": "bcn3d setting"
                 },
-                "purge_length":
+                "smart_purge_minimum_purge_distance":
                 {
-                    "label": "Purge Length",
-                    "description": "Purged distance when purge is needed.",
+                    "label": "Minimum Purge Distance",
+                    "description": "Minimum distance to purge when changing toolheads.",
+                    "unit": "mm",
+                    "type": "float",
+                    "default_value": 1.5,
+                    "minimum_value": "0",
+                    "minimum_value_warning": "0",
+                    "maximum_value_warning": "50",
+                    "enabled": "smart_purge",
+                    "settable_per_extruder": true,
+                    "comments": "bcn3d setting"
+                },
+                "smart_purge_maximum_purge_distance":
+                {
+                    "label": "Maximum Purge Distance",
+                    "description": "Maximum distance to purge when changing toolheads.",
                     "unit": "mm",
                     "type": "float",
                     "default_value": 1.5,

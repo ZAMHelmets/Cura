@@ -26,10 +26,12 @@ class Bcn3DFixes(Job):
                                                         extruder_right.getProperty("retraction_hop_height_after_extruder_switch", "value")]
         self._smartPurge = [extruder_left.getProperty("smart_purge", "value"),
                             extruder_right.getProperty("smart_purge", "value")]
-        self._minimumExtrusion = [extruder_left.getProperty("minimum_extrusion", "value"),
-                                  extruder_right.getProperty("minimum_extrusion", "value")]
-        self._purgeLength = [extruder_left.getProperty("purge_length", "value"),
-                             extruder_right.getProperty("purge_length", "value")]
+        self._smartPurgeSParameter = [extruder_left.getProperty("smart_purge_slope", "value"),
+                                      extruder_right.getProperty("smart_purge_slope", "value")]
+        self._smartPurgeEParameter = [extruder_left.getProperty("smart_purge_maximum_purge_distance", "value"),
+                                      extruder_right.getProperty("smart_purge_maximum_purge_distance", "value")]
+        self._smartPurgePParameter = [extruder_left.getProperty("smart_purge_minimum_purge_distance", "value"),
+                                      extruder_right.getProperty("smart_purge_minimum_purge_distance", "value")]
         self._retractReduction = active_extruder.getProperty("retract_reduction", "value")
         self._avoidGrindingFilament = [extruder_left.getProperty("avoid_grinding_filament", "value"),
                                        extruder_right.getProperty("avoid_grinding_filament", "value")]
@@ -275,53 +277,38 @@ class Bcn3DFixes(Job):
     def _handleSmartPurge(self):
         if (self._smartPurge[0] or self._smartPurge[1]) and self._both_extruders:
             self._startGcodeInfo.append("; - Smart Purge")
-            extraPurges = []
-            for index, layer in enumerate(self._gcode_list):
-                lines = layer.split("\n")
-                temp_index = 0
-                while temp_index < len(lines):
-                    if not layer.startswith(";LAYER:0") and layer.startswith(";LAYER:") and (lines[temp_index].startswith("T0") or lines[temp_index].startswith("T1")):
-                        if lines[temp_index].startswith("T0"):
-                            countingForTool = 0
-                        elif lines[temp_index].startswith("T1"):
-                            countingForTool = 1
-                        lineCount = temp_index - 1
-                        while lineCount >= 0:
-                            line = lines[lineCount]
-                            if self._smartPurge[countingForTool] and GCodeUtils.charsInLine("GFE", line) and GCodeUtils.getValue(line, "E") < self._minimumExtrusion[abs(countingForTool - 1)]:
-                                extraPurges.append(index - 1)
-                                break
-                            lineCount -= 1
-                        break
-                    temp_index += 1
             for index, layer in enumerate(self._gcode_list):
                 lines = layer.split("\n")
                 applyFix = False
-                if len(extraPurges) > 0:
-                    if index == extraPurges[0]:
-                        temp_index = 0
-                        while temp_index < len(lines):
-                            if lines[temp_index].startswith("T0") or lines[temp_index].startswith("T1"):
-                                applyFix = True
-                                if lines[temp_index].startswith("T0"):
-                                    countingForTool = 0
-                                elif lines[temp_index].startswith("T1"):
-                                    countingForTool = 1
-                            elif applyFix and lines[temp_index].startswith("M109 S"):
-                                lineCount = temp_index
-                                while not lines[lineCount].startswith("M104 S"):
-                                    lineCount += 1
-                                    if GCodeUtils.charsInLine(["G1", "F", "X", "Y", "E"], lines[lineCount]):
-                                        lineCount = temp_index
-                                        break
-                                lines[temp_index] = lines[temp_index] + "\nM104 S" + str(
-                                    GCodeUtils.getValue(lines[lineCount], "S")) + "\nG1 F" + self._switchExtruderPrimeSpeed[countingForTool] + " E" + \
-                                                    str(self._switchExtruderRetractionAmount[countingForTool]) + "\nG1 F" + str(GCodeUtils.getPurgeSpeed(lines, temp_index)) + " E" + \
-                                                    str(self._switchExtruderRetractionAmount[countingForTool] + self._purgeLength[countingForTool]) + "\nG4 P2000\nG1 F" + self._retractionRetractSpeed[countingForTool] + " E" + \
-                                                    str(self._retractionAmount[countingForTool]) + "\nG92 E0"
-                                break
-                            temp_index += 1
-                        del extraPurges[0]
+                if not layer.startswith(";LAYER:0") and layer.startswith(";LAYER:"):
+                    temp_index = 0
+                    while temp_index < len(lines):
+                        if lines[temp_index].startswith("T0") or lines[temp_index].startswith("T1"):
+                            applyFix = True
+                            if lines[temp_index].startswith("T0"):
+                                countingForTool = 0
+                            elif lines[temp_index].startswith("T1"):
+                                countingForTool = 1
+                        elif applyFix and lines[temp_index].startswith("M109 S"):
+                            lineCount = temp_index
+                            while not lines[lineCount].startswith("M104 S"):
+                                lineCount += 1
+                                if GCodeUtils.charsInLine(["G1", "F", "X", "Y", "E"], lines[lineCount]):
+                                    lineCount = temp_index
+                                    break
+                            lines[temp_index] = lines[temp_index] + "\nM104 S" + str(
+                                GCodeUtils.getValue(lines[lineCount], "S")) + "\nG1 F" + self._switchExtruderPrimeSpeed[
+                                                    countingForTool] + " E" + \
+                                                str(self._switchExtruderRetractionAmount[countingForTool]) + \
+                                                "\nM800 F" + str(
+                                GCodeUtils.getPurgeSpeed(lines, temp_index)) + " S" + str(
+                                self._smartPurgeSParameter[countingForTool]) + " E" + str(
+                                self._smartPurgeEParameter[countingForTool]) + " P" + str(
+                                self._smartPurgePParameter[countingForTool]) + " ;SmartPurge" + "\nG4 P2000\nG1 F" + \
+                                                self._retractionRetractSpeed[countingForTool] + " E" + \
+                                                str(self._retractionAmount[countingForTool]) + "\nG92 E0"
+                            break
+                        temp_index += 1
                 layer = "\n".join(lines)
                 self._gcode_list[index] = layer
             Logger.log("d", "smart_purge applied")

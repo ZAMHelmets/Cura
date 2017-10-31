@@ -41,7 +41,7 @@ class CuraActions(QObject):
         Application.getInstance().functionEvent(event)
 
     ##  Reset camera position and direction to default
-    @ pyqtSlot()
+    @pyqtSlot()
     def homeCamera(self) -> None:
         scene = Application.getInstance().getController().getScene()
         camera = scene.getActiveCamera()

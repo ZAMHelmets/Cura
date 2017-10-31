@@ -38,7 +38,6 @@ class PrintModeManager:
             'prime_tower_enable': False,
             'ooze_shield_enabled': False,
             'carve_multiple_volumes': False,
-            'smart_purge': False,
             'retraction_max_count': 1000
         }
 

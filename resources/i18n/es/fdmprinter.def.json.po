@@ -3851,6 +3851,36 @@ msgid "Add an extra prime amount to compensate oozed material while the Extruder
 msgstr "Distancia a elevar el cabezal cuando se cambia de extrusor."
 
 #: fdmprinter.def.json
+msgctxt "smart_purge_slope label"
+msgid "Distance Gradient"
+msgstr "Gradiente de purga"
+
+#: fdmprinter.def.json
+msgctxt "smart_purge_slope description"
+msgid "Distance to purge per second idle. Purged distance will increase this amount each second the toolhead remains idle. If the final distance is shorter than the Minimum Purge Distance it will be increased to this value the ensure the right Hotend's pressure. If the final distance is greater than the Maximum Purge Distance it will be decreased to this value to avoid purge tray filling."
+msgstr "Distancia a purgar por segundo inactivo. La distancia purgada incrementará este valor por cada segundo que la herramienta esté inactiva. Si la distancia calculada es inferior a la Mínima distancia a purgar, se incrementara a dicho valor para asegurar una presión correcta en el Hotend. Si la distancia calculada es superior a la Máxima distancia a purgar, se reducirá dicho valor para evitar un excesivo rellenamiento del cajetín de purga."
+
+#: fdmprinter.def.json
+msgctxt "smart_purge_minimum_purge_distance label"
+msgid "Minimum Purge Distance"
+msgstr "Mínima distancia a purgar"
+
+#: fdmprinter.def.json
+msgctxt "smart_purge_minimum_purge_distance description"
+msgid "Minimum distance to purge when changing toolheads."
+msgstr "Distancia mínima a purgar cuando se cambia de cabezal."
+
+#: fdmprinter.def.json
+msgctxt "smart_purge_maximum_purge_distance label"
+msgid "Maximum Purge Distance"
+msgstr "Máxima distancia a purgar"
+
+#: fdmprinter.def.json
+msgctxt "smart_purge_maximum_purge_distance description"
+msgid "Maximum distance to purge when changing toolheads."
+msgstr "Distancia máxima a purgar cuando se cambia de cabezal."
+
+#: fdmprinter.def.json
 msgctxt "minimum_extrusion label"
 msgid "Minimum Extrusion"
 msgstr "Extrusión mínima"

@@ -45,6 +45,16 @@ class Bcn3DFixes(Job):
         self._retractionExtrusionWindow = [extruder_left.getProperty("retraction_extrusion_window", "value"),
                                           extruder_right.getProperty("retraction_extrusion_window", "value")]
 
+        #Temperatures
+        self._materialInitialPrintTemperature = [extruder_left.getProperty("material_initial_print_temperature", "value"),
+                                                 extruder_right.getProperty("material_initial_print_temperature", "value")]
+        self._materialFinalPrintTemperature = [extruder_left.getProperty("material_final_print_temperature", "value"),
+                                                extruder_right.getProperty("material_final_print_temperature", "value")]
+        self._materialPrintTemperature = [extruder_left.getProperty("material_print_temperature", "value"),
+                                          extruder_right.getProperty("material_print_temperature", "value")]
+        self._materialStandByTemperature = [extruder_left.getProperty("material_standby_temperature", "value"),
+                                                 extruder_right.getProperty("material_standby_temperature", "value")]
+
         #Speeds
         self._travelSpeed = [str(int(extruder_left.getProperty("speed_travel", "value")*60)),
                              str(int(extruder_right.getProperty("speed_travel", "value") * 60))]
@@ -93,8 +103,8 @@ class Bcn3DFixes(Job):
         self._handleActiveExtruders()
         self._handleFixToolChangeZHop()
         self._handleFixFirstRetract()
-        self._handleSmartPurge()
         self._handleFixTemperatureOscilation()
+        self._handleSmartPurge()
         self._handleRetractReduction()
         self._handleAvoidGrindingFilament()
 
@@ -160,6 +170,100 @@ class Bcn3DFixes(Job):
                 self._gcode_list[index] = layer
             Logger.log("d", "active_extruders applied")
     
+    def _handleFixTemperatureOscilation(self):
+        if self._fixTemperatureOscilation and self._both_extruders:
+            self._startGcodeInfo.append("; - Fix Temperature Oscilation")
+            # Scan all temperatures
+            temperatures = []  # [(layerIndex, lineIndex, action, line)]
+            for index, layer in enumerate(self._gcode_list):
+                lines = layer.split("\n")
+                temp_index = 0
+                while temp_index < len(lines):
+                    line = lines[temp_index]
+                    if layer.startswith(";LAYER:"):
+                        if line.startswith("M109"):
+                            temperatures.append([index, temp_index, "heat", line])
+                        elif line.startswith("T"):
+                            temperatures.append([index, temp_index, "toolChange", line])
+                        elif line.startswith("M104"):
+                            if line.startswith("M104 T"):
+                                temperatures.append([index, temp_index, "preheat", line])
+                            else:
+                                temperatures.append([index, temp_index, "unknown", line])
+                    temp_index += 1
+            # Define "unknown" roles
+            for elementIndex in range(len(temperatures)):
+                action = temperatures[elementIndex][2]
+                if action == "unknown":
+                    if elementIndex + 1 < len(temperatures):
+                        if temperatures[elementIndex + 1][3].startswith("T"):
+                            action = "coolDownActive"
+                        else:
+                            action = "setpoint"
+                    temperatures[elementIndex][2] = action
+                elif action == "preheat":
+                    temp_index = elementIndex - 1
+                    while temp_index >= 0 and temperatures[temp_index][2] != "toolChange":
+                        if temperatures[temp_index][2] == 'preheat':
+                            action = "coolDownIdle"
+                            temperatures[temp_index][2] = action
+                            break
+                        temp_index -= 1
+            # Correct all temperatures
+            countingForTool = 0
+            for elementIndex in range(len(temperatures)):
+                action = temperatures[elementIndex][2]
+                if action == "toolChange":
+                    if temperatures[elementIndex][3] == "T0":
+                        countingForTool = 0
+                    else:
+                        countingForTool = 1
+                temperature_inertia_initial_fix = self._materialInitialPrintTemperature[countingForTool] - self._materialPrintTemperature[countingForTool]
+                temperature_inertia_final_fix = self._materialFinalPrintTemperature[countingForTool] - self._materialPrintTemperature[countingForTool]
+                if action == "preheat":
+                    temp_index = elementIndex + 1
+                    toolChanged = False
+                    while temp_index < len(temperatures):
+                        if temperatures[temp_index][2] == "toolChange":
+                            if toolChanged:
+                                break
+                            else:
+                                toolChanged = True
+                        elif temperatures[temp_index][2] == "heat":
+                            heatIndex = temp_index
+                        elif toolChanged and temperatures[temp_index][2] == "setpoint":
+                            correctTemperatureValue = GCodeUtils.getValue(temperatures[temp_index][3], "S") + temperature_inertia_initial_fix
+                            temperatures[elementIndex][3] = temperatures[elementIndex][3].split("S")[0] + "S" + str(correctTemperatureValue)
+                            temperatures[heatIndex][3] = temperatures[heatIndex][3].split("S")[0] + "S" + str(correctTemperatureValue)
+                            break
+                        temp_index += 1
+                elif action == "coolDownIdle":
+                    correctTemperatureValue = max(GCodeUtils.getValue(temperatures[elementIndex][3], "S") + temperature_inertia_initial_fix,
+                        self._materialStandByTemperature[countingForTool])
+                    temperatures[elementIndex][3] = temperatures[elementIndex][3].split("S")[0] + "S" + str(correctTemperatureValue)
+                elif action == "coolDownActive":
+                    temp_index = elementIndex - 1
+                    while temp_index >= 0:
+                        if temperatures[temp_index][2] == "coolDownActive":
+                            break
+                        if temperatures[temp_index][2] == "setpoint":
+                            correctTemperatureValue = GCodeUtils.getValue(temperatures[temp_index][3], "S") + temperature_inertia_final_fix
+                            temperatures[elementIndex][3] = temperatures[elementIndex][3].split("S")[0] + "S" + str(correctTemperatureValue)
+                            break
+                        temp_index -= 1
+            # Set back new corrected temperatures
+            for index, layer in enumerate(self._gcode_list):
+                lines = layer.split("\n")
+                temp_index = 0
+                while temp_index < len(lines) and len(temperatures) > 0:
+                    if index == temperatures[0][0] and temp_index == temperatures[0][1]:
+                        lines[temp_index] = temperatures[0][3]
+                        del temperatures[0]
+                    temp_index += 1
+                layer = "\n".join(lines)
+                self._gcode_list[index] = layer
+            Logger.log("d", "fix_temperature_oscilation applied")
+
     def _handleFixToolChangeZHop(self):
         if self._fixToolChangeZHop and self._both_extruders:
             self._startGcodeInfo.append("; - Fix Tool Change Z Hop")
@@ -204,7 +308,7 @@ class Bcn3DFixes(Job):
                 layer = re.sub(regex, "", layer)
                 self._gcode_list[index] = layer
             Logger.log("d", "fix_tool_change_z_hop applied")
-                
+
     def _handleFixFirstRetract(self):
         if self._fixFirstRetract:
             self._startGcodeInfo.append("; - Fix First Extrusion")
@@ -291,117 +395,29 @@ class Bcn3DFixes(Job):
                                 countingForTool = 1
                         elif applyFix and lines[temp_index].startswith("M109 S"):
                             lineCount = temp_index
-                            while not lines[lineCount].startswith("M104 S"):
-                                lineCount += 1
-                                if GCodeUtils.charsInLine(["G1", "F", "X", "Y", "E"], lines[lineCount]):
-                                    lineCount = temp_index
+                            temperature_index = None
+                            while lineCount < len(lines):
+                                if lines[lineCount].startswith("M104 S"):
+                                    temperature_index = lineCount
+                                elif GCodeUtils.charsInLine(["G1", "F", "X", "Y", "E"], lines[lineCount]):
+                                    if temperature_index is not None:
+                                        lines[temp_index] = lines[temp_index] + \
+                                                            "\nG1 F" + self._switchExtruderPrimeSpeed[countingForTool] + \
+                                                            " E" + str(self._switchExtruderRetractionAmount[countingForTool]) + \
+                                                            "\nM800 F" + str(GCodeUtils.getPurgeSpeed(lines, temp_index)) + \
+                                                            " S" + str(self._smartPurgeSParameter[countingForTool]) + \
+                                                            " E" + str(self._smartPurgeEParameter[countingForTool]) + \
+                                                            " P" + str(self._smartPurgePParameter[countingForTool]) + " ;smartpurge" + \
+                                                            "\nG4 P2000\nG1 F" + self._retractionRetractSpeed[countingForTool] + \
+                                                            " E" + str(self._retractionAmount[countingForTool]) + "\nG92 E0"
+                                        del lines[temperature_index]
                                     break
-                            lines[temp_index] = lines[temp_index] + "\nM104 S" + str(
-                                GCodeUtils.getValue(lines[lineCount], "S")) + "\nG1 F" + self._switchExtruderPrimeSpeed[
-                                                    countingForTool] + " E" + \
-                                                str(self._switchExtruderRetractionAmount[countingForTool]) + \
-                                                "\nM800 F" + str(
-                                GCodeUtils.getPurgeSpeed(lines, temp_index)) + " S" + str(
-                                self._smartPurgeSParameter[countingForTool]) + " E" + str(
-                                self._smartPurgeEParameter[countingForTool]) + " P" + str(
-                                self._smartPurgePParameter[countingForTool]) + " ;SmartPurge" + "\nG4 P2000\nG1 F" + \
-                                                self._retractionRetractSpeed[countingForTool] + " E" + \
-                                                str(self._retractionAmount[countingForTool]) + "\nG92 E0"
+                                lineCount += 1
                             break
                         temp_index += 1
                 layer = "\n".join(lines)
                 self._gcode_list[index] = layer
             Logger.log("d", "smart_purge applied")
-
-    def _handleFixTemperatureOscilation(self):
-        if self._fixTemperatureOscilation and self._both_extruders:
-            self._startGcodeInfo.append("; - Fix Temperature Oscilation")
-            # Scan all temperatures
-            temperatures = []  # [(layerIndex, lineIndex, action, line)]
-            for index, layer in enumerate(self._gcode_list):
-                lines = layer.split("\n")
-                temp_index = 0
-                while temp_index < len(lines):
-                    line = lines[temp_index]
-                    if layer.startswith(";LAYER:"):
-                        if line.startswith("M109"):
-                            temperatures.append([index, temp_index, "heat", line])
-                        elif line.startswith("T"):
-                            temperatures.append([index, temp_index, "toolChange", line])
-                        elif line.startswith("M104"):
-                            temperatures.append([index, temp_index, "unknown", line])
-                    temp_index += 1
-            # Define "unknown" roles
-            for elementIndex in range(len(temperatures)):
-                action = temperatures[elementIndex][2]
-                if action == "unknown":
-                    if temperatures[elementIndex][3].startswith("M104 T"):
-                        temp_index = elementIndex - 1
-                        while temp_index >= 0:
-                            if temperatures[temp_index][3].startswith("T"):
-                                action = "coolDownIdle"
-                                break
-                            elif temperatures[temp_index][3].startswith("M104 T"):
-                                action = "preheat"
-                                break
-                            temp_index -= 1
-                    elif temperatures[elementIndex][3].startswith("M104 S"):
-                        if elementIndex + 1 < len(temperatures):
-                            if temperatures[elementIndex + 1][3].startswith("T"):
-                                action = "coolDownActive"
-                            else:
-                                action = "setpoint"
-                    temperatures[elementIndex][2] = action
-            # Correct all temperatures
-            for elementIndex in range(len(temperatures)):
-                action = temperatures[elementIndex][2]
-                temperature_inertia_initial_fix = self._container.getProperty("material_initial_print_temperature", "value") - self._container.getProperty("material_print_temperature", "value")
-                temperature_inertia_final_fix = self._container.getProperty("material_final_print_temperature", "value") - self._container.getProperty("material_print_temperature", "value")
-                if action == "preheat":
-                    temp_index = elementIndex + 1
-                    while temp_index < len(temperatures):
-                        if temperatures[temp_index][2] == "preheat":
-                            break
-                        elif temperatures[temp_index][2] == "setpoint":
-                            correctTemperatureValue = GCodeUtils.getValue(temperatures[temp_index][3], "S") + temperature_inertia_initial_fix
-                            temperatures[elementIndex][3] = temperatures[elementIndex][3].split("S")[0] + "S" + str(correctTemperatureValue)
-                            break
-                        temp_index += 1
-                elif action == "heat":
-                    temp_index = elementIndex - 1
-                    while temp_index >= 0:
-                        if temperatures[temp_index][2] == "preheat":
-                            correctTemperatureValue = GCodeUtils.getValue(temperatures[temp_index][3], "S")
-                            temperatures[elementIndex][3] = temperatures[elementIndex][3].split("S")[0] + "S" + str(correctTemperatureValue)
-                            break
-                        temp_index -= 1
-                elif action == "coolDownIdle":
-                    correctTemperatureValue = max(
-                        GCodeUtils.getValue(temperatures[elementIndex][3], "S") + temperature_inertia_initial_fix,
-                        self._container.getProperty("material_standby_temperature", "value"))
-                    temperatures[elementIndex][3] = temperatures[elementIndex][3].split("S")[0] + "S" + str(correctTemperatureValue)
-                elif action == "coolDownActive":
-                    temp_index = elementIndex - 1
-                    while temp_index >= 0:
-                        if temperatures[temp_index][2] == "coolDownActive":
-                            break
-                        if temperatures[temp_index][2] == "setpoint":
-                            correctTemperatureValue = GCodeUtils.getValue(temperatures[temp_index][3], "S") + temperature_inertia_final_fix
-                            temperatures[elementIndex][3] = temperatures[elementIndex][3].split("S")[0] + "S" + str(correctTemperatureValue)
-                            break
-                        temp_index -= 1
-            # Set back new corrected temperatures
-            for index, layer in enumerate(self._gcode_list):
-                lines = layer.split("\n")
-                temp_index = 0
-                while temp_index < len(lines) and len(temperatures) > 0:
-                    if index == temperatures[0][0] and temp_index == temperatures[0][1]:
-                        lines[temp_index] = temperatures[0][3]
-                        del temperatures[0]
-                    temp_index += 1
-                layer = "\n".join(lines)
-                self._gcode_list[index] = layer
-            Logger.log("d", "fix_temperature_oscilation applied")
                 
     def _handleRetractReduction(self):
         if self._retractReduction:

@@ -1631,7 +1631,7 @@
                     "minimum_value": "-273.15",
                     "minimum_value_warning": "0",
                     "maximum_value_warning": "285",
-                    "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)",
+                    "enabled": "machine_nozzle_temp_enabled",
                     "settable_per_mesh": false,
                     "settable_per_extruder": true
                 },
@@ -4700,7 +4700,7 @@
                     "label": "Smart Purge",
                     "description": "Add an extra prime amount to compensate oozed material while the Extruder was idle. Disable Prime tower to save time and filament.",
                     "type": "bool",
-                    "default_value": true,
+                    "default_value": false,
                     "enabled": false,
                     "settable_per_extruder": true,
                     "comments": "bcn3d setting"

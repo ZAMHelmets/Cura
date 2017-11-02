@@ -56,16 +56,18 @@ class Bcn3DFixes(Job):
                                                  extruder_right.getProperty("material_standby_temperature", "value")]
 
         #Speeds
-        self._travelSpeed = [str(int(extruder_left.getProperty("speed_travel", "value")*60)),
+        self._travelSpeed = [str(int(extruder_left.getProperty("speed_travel", "value") * 60)),
                              str(int(extruder_right.getProperty("speed_travel", "value") * 60))]
         self._retractionRetractSpeed = [str(int(extruder_left.getProperty("retraction_retract_speed", "value") * 60)),
                                         str(int(extruder_right.getProperty("retraction_retract_speed", "value") * 60))]
-        self._retractionPrimeSpeed = [str(int(extruder_left.getProperty("retraction_prime_speed", "value")*60)),
-                                      str(int(extruder_right.getProperty("retraction_prime_speed", "value")*60))]
+        self._retractionPrimeSpeed = [str(int(extruder_left.getProperty("retraction_prime_speed", "value") * 60)),
+                                      str(int(extruder_right.getProperty("retraction_prime_speed", "value") * 60))]
         self._switchExtruderRetractionSpeed = [str(int(extruder_left.getProperty("switch_extruder_retraction_speed", "value") * 60)),
                                                str(int(extruder_right.getProperty("switch_extruder_retraction_speed", "value") * 60))]
-        self._switchExtruderPrimeSpeed = [str(int(extruder_left.getProperty("switch_extruder_prime_speed", "value")*60)),
-                                          str(int(extruder_right.getProperty("switch_extruder_prime_speed", "value")*60))]
+        self._switchExtruderPrimeSpeed = [str(int(extruder_left.getProperty("switch_extruder_prime_speed", "value") * 60)),
+                                          str(int(extruder_right.getProperty("switch_extruder_prime_speed", "value") * 60))]
+        self._purgeSpeed = [str(int(extruder_left.getProperty("purge_speed", "value") * 60)),
+                            str(int(extruder_right.getProperty("purge_speed", "value") * 60))]
 
         self._startGcodeInfo = [";BCN3D Fixes applied"]
 
@@ -412,11 +414,10 @@ class Bcn3DFixes(Job):
                                     del lines[temp_index]
                                     break
                                 temp_index += 1
-                            # insert smartPurge sequence
                             lines[smartPurgeLineIndex] = lines[smartPurgeLineIndex] + \
                                                 "\nG1 F" + self._switchExtruderPrimeSpeed[countingForTool] + \
                                                 " E" + str(self._switchExtruderRetractionAmount[countingForTool]) + \
-                                                "\nM800 F" + str(GCodeUtils.getPurgeSpeed(lines, smartPurgeLineIndex)) + \
+                                                "\nM800 F" + self._purgeSpeed[countingForTool] + \
                                                 " S" + str(self._smartPurgeSParameter[countingForTool]) + \
                                                 " E" + str(self._smartPurgeEParameter[countingForTool]) + \
                                                 " P" + str(self._smartPurgePParameter[countingForTool]) + " ;smartpurge" + \
@@ -518,7 +519,7 @@ class Bcn3DFixes(Job):
                                                                                 str(abs(countingForTool - 1)) + "\nT" + \
                                                                                 str(countingForTool) + "\nG91\nG1 F" + self._travelSpeed[countingForTool] + " Z" + str(self._retractionHopHeightAfterExtruderSwitch[countingForTool]) + "\nG90\nG1 F" + self._retractionPrimeSpeed[countingForTool] + " E" + \
                                                                                 str(round(eValue + purgeLength, 5)) + "\nG1 F" + \
-                                                                                str(GCodeUtils.getPurgeSpeed(lines, temp_index)) + " E" + \
+                                                                                self._purgeSpeed[countingForTool] + " E" + \
                                                                                 str(round(eValue + 2 * purgeLength, 5)) + "\nG4 P2000\nG1 F" + self._retractionRetractSpeed[countingForTool] + " E" + \
                                                                                 str(round(eValue + purgeLength, 5)) + "\nG92 E" + \
                                                                                 str(eValue) + "\nG1 F" + self._travelSpeed[countingForTool] + " X" + \
@@ -527,7 +528,7 @@ class Bcn3DFixes(Job):
                                                             lines[temp_index] = lines[temp_index] + " ;prevent filament grinding on T" + \
                                                                                 str(countingForTool) + "\nG1 F" + self._travelSpeed[countingForTool] + "\nG71\nG91\nG1 F" + self._travelSpeed[countingForTool] + " Z" + str(self._retractionHopHeightAfterExtruderSwitch[countingForTool]) + "\nG90\nG1 F" + self._retractionPrimeSpeed[countingForTool] + " E" + \
                                                                                 str(round(eValue + purgeLength, 5)) + "\nG1 F" + \
-                                                                                str(GCodeUtils.getPurgeSpeed(lines, temp_index)) + " E" + \
+                                                                                self._purgeSpeed[countingForTool] + " E" + \
                                                                                 str(round(eValue + 2 * purgeLength,5)) + "\nG4 P2000\nG1 F" + self._retractionRetractSpeed[countingForTool] + " E" + \
                                                                                 str(round(eValue + purgeLength, 5)) + "\nG92 E" + \
                                                                                 str(eValue) + "\nG1 F" + self._travelSpeed[countingForTool] + "\nG72\nG1 F" + self._travelSpeed[countingForTool] + " X" + \

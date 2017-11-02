@@ -388,33 +388,39 @@ class Bcn3DFixes(Job):
                     temp_index = 0
                     while temp_index < len(lines):
                         if lines[temp_index].startswith("T0") or lines[temp_index].startswith("T1"):
+                            # toolchange found
                             applyFix = True
+                            toolChangeIndex = temp_index
                             if lines[temp_index].startswith("T0"):
                                 countingForTool = 0
                             elif lines[temp_index].startswith("T1"):
                                 countingForTool = 1
-                        elif applyFix and lines[temp_index].startswith("M109 S"):
-                            lineCount = temp_index
-                            temperature_index = None
-                            while lineCount < len(lines):
-                                if lines[lineCount].startswith("M104 S"):
-                                    temperature_index = lineCount
-                                elif GCodeUtils.charsInLine(["G1", "F", "X", "Y", "E"], lines[lineCount]):
-                                    if temperature_index is not None:
-                                        lines[temp_index] = lines[temp_index] + \
-                                                            "\nG1 F" + self._switchExtruderPrimeSpeed[countingForTool] + \
-                                                            " E" + str(self._switchExtruderRetractionAmount[countingForTool]) + \
-                                                            "\nM800 F" + str(GCodeUtils.getPurgeSpeed(lines, temp_index)) + \
-                                                            " S" + str(self._smartPurgeSParameter[countingForTool]) + \
-                                                            " E" + str(self._smartPurgeEParameter[countingForTool]) + \
-                                                            " P" + str(self._smartPurgePParameter[countingForTool]) + " ;smartpurge" + \
-                                                            "\nG4 P2000\nG1 F" + self._retractionRetractSpeed[countingForTool] + \
-                                                            " E" + str(self._retractionAmount[countingForTool]) + "\nG92 E0"
-                                        del lines[temperature_index]
+                        elif applyFix and GCodeUtils.charsInLine(["G1", "F", "X", "Y", "E"], lines[temp_index]):
+                            # first extrusion with the new tool found
+                            extrudeAgainIndex = temp_index
+                            temp_index = toolChangeIndex
+                            foundM109 = False
+                            while temp_index < extrudeAgainIndex:
+                                if lines[temp_index].startswith("M109 S"):
+                                    foundM109 = True
+                                elif foundM109 and lines[temp_index].startswith("M104 S"):
+                                    # remove M104 extra line
+                                    del lines[temp_index]
                                     break
-                                lineCount += 1
+                                temp_index += 1
+                            # insert smartPurge sequence
+                            lines[toolChangeIndex] = lines[toolChangeIndex] + \
+                                                "\nG1 F" + self._switchExtruderPrimeSpeed[countingForTool] + \
+                                                " E" + str(self._switchExtruderRetractionAmount[countingForTool]) + \
+                                                "\nM800 F" + str(GCodeUtils.getPurgeSpeed(lines, toolChangeIndex)) + \
+                                                " S" + str(self._smartPurgeSParameter[countingForTool]) + \
+                                                " E" + str(self._smartPurgeEParameter[countingForTool]) + \
+                                                " P" + str(self._smartPurgePParameter[countingForTool]) + " ;smartpurge" + \
+                                                "\nG4 P2000\nG1 F" + self._retractionRetractSpeed[countingForTool] + \
+                                                " E" + str(self._retractionAmount[countingForTool]) + "\nG92 E0"
                             break
                         temp_index += 1
+
                 layer = "\n".join(lines)
                 self._gcode_list[index] = layer
             Logger.log("d", "smart_purge applied")

@@ -400,7 +400,11 @@ class Bcn3DFixes(Job):
                             extrudeAgainIndex = temp_index
                             temp_index = toolChangeIndex
                             foundM109 = False
-                            while temp_index < extrudeAgainIndex:
+                            foundFirstTravel = False
+                            while temp_index <= extrudeAgainIndex:
+                                if not foundFirstTravel and GCodeUtils.charsInLine(["G", "F", "X", "Y"], lines[temp_index]):
+                                    foundFirstTravel = True
+                                    smartPurgeLineIndex = temp_index - 1
                                 if lines[temp_index].startswith("M109 S"):
                                     foundM109 = True
                                 elif foundM109 and lines[temp_index].startswith("M104 S"):
@@ -409,15 +413,15 @@ class Bcn3DFixes(Job):
                                     break
                                 temp_index += 1
                             # insert smartPurge sequence
-                            lines[toolChangeIndex] = lines[toolChangeIndex] + \
+                            lines[smartPurgeLineIndex] = lines[smartPurgeLineIndex] + \
                                                 "\nG1 F" + self._switchExtruderPrimeSpeed[countingForTool] + \
                                                 " E" + str(self._switchExtruderRetractionAmount[countingForTool]) + \
-                                                "\nM800 F" + str(GCodeUtils.getPurgeSpeed(lines, toolChangeIndex)) + \
+                                                "\nM800 F" + str(GCodeUtils.getPurgeSpeed(lines, smartPurgeLineIndex)) + \
                                                 " S" + str(self._smartPurgeSParameter[countingForTool]) + \
                                                 " E" + str(self._smartPurgeEParameter[countingForTool]) + \
                                                 " P" + str(self._smartPurgePParameter[countingForTool]) + " ;smartpurge" + \
-                                                "\nG4 P2000\nG1 F" + self._retractionRetractSpeed[countingForTool] + \
-                                                " E" + str(self._retractionAmount[countingForTool]) + "\nG92 E0"
+                                                "\nG4 P2000\nG92 E0\nG1 F" + self._retractionRetractSpeed[countingForTool] + \
+                                                " E-" + str(self._retractionAmount[countingForTool]) + "\nG92 E0"
                             break
                         temp_index += 1
 

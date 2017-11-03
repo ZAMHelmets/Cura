@@ -422,7 +422,7 @@ class Bcn3DFixes(Job):
                                                 " E" + str(self._smartPurgeEParameter[countingForTool]) + \
                                                 " P" + str(self._smartPurgePParameter[countingForTool]) + " ;smartpurge" + \
                                                 "\nG4 P2000\nG92 E0\nG1 F" + self._retractionRetractSpeed[countingForTool] + \
-                                                " E-" + str(self._retractionAmount[countingForTool]) + "\nG92 E0"
+                                                " E-" + str(self._switchExtruderRetractionAmount[countingForTool]) + "\nG92 E0"
                             break
                         temp_index += 1
 

@@ -2,8 +2,8 @@
 *New parameters to improve Smart Purge control
 *New icon color
 *Bug fixes
-Now Smart Purge works as expected
-New
+Now Smart Purge works as expected.
+Config files won't create conflicts with older versions.
 [1.0.2]
 *Bug fixes
 Center models in the printing zone when duplication/mirror mode.

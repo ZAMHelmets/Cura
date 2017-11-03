@@ -1,3 +1,9 @@
+[1.0.3]
+*New parameters to improve Smart Purge control
+*New icon color
+*Bug fixes
+Now Smart Purge works as expected
+New
 [1.0.2]
 *Bug fixes
 Center models in the printing zone when duplication/mirror mode.

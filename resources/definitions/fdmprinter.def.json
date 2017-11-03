@@ -2302,6 +2302,19 @@
                     "settable_per_extruder": true,
                     "limit_to_extruder": "adhesion_extruder_nr"
                 },
+                "purge_speed":
+                {
+                    "label": "Purge Speed",
+                    "description": "The speed at which the filament is pushed by the extruder when purging in the purge tray.",
+                    "unit": "mm/s",
+                    "type": "float",
+                    "default_value": 0.8,
+                    "minimum_value": "1/60.0",
+                    "maximum_value": "machine_max_feedrate_e",
+                    "enabled": "avoid_grinding_filament or smart_purge",
+                    "settable_per_mesh": false,
+                    "settable_per_extruder": true
+                },
                 "max_feedrate_z_override":
                 {
                     "label": "Maximum Z Speed",

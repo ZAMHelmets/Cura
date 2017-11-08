@@ -364,7 +364,7 @@ UM.MainWindow
                     bottomMargin: UM.Theme.getSize("default_margin").height;
                 }
 
-                source: UM.Theme.getImage("logo");
+                source: UM.Theme.getImage("bcn3dLogo");
                 width: UM.Theme.getSize("logo").width;
                 height: UM.Theme.getSize("logo").height;
                 z: -1;

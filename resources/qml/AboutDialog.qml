@@ -25,7 +25,7 @@ UM.Dialog
         width: (base.minimumWidth * 0.85) | 0
         height: (width * (1/4.25)) | 0
 
-        source: UM.Theme.getImage("logoBlack")
+        source: UM.Theme.getImage("logo")
 
         sourceSize.width: width
         sourceSize.height: height

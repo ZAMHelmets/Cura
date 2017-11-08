@@ -22,23 +22,23 @@ class PrintModeManager:
 
         #Settings which value needs to be handled when changing print_mode
         self._conflict_settings = {
-            'wall_extruder_nr': '-1',
-            'wall_0_extruder_nr': '-1',
-            'wall_x_extruder_nr': '-1',
-            'roofing_extruder_nr': '-1',
-            'top_bottom_extruder_nr': '-1',
-            'infill_extruder_nr': '-1',
-            'support_extruder_nr': '0',
-            'support_infill_extruder_nr': '0',
-            'support_extruder_nr_layer_0': '0',
-            'support_interface_extruder_nr': '0',
-            'support_roof_extruder_nr': '0',
-            'support_bottom_extruder_nr': '0',
-            'adhesion_extruder_nr': '0',
-            'prime_tower_enable': False,
-            'ooze_shield_enabled': False,
-            'carve_multiple_volumes': False,
-            'retraction_max_count': 1000
+            'wall_extruder_nr',
+            'wall_0_extruder_nr',
+            'wall_x_extruder_nr',
+            'roofing_extruder_nr',
+            'top_bottom_extruder_nr',
+            'infill_extruder_nr',
+            'support_extruder_nr',
+            'support_infill_extruder_nr',
+            'support_extruder_nr_layer_0',
+            'support_interface_extruder_nr',
+            'support_roof_extruder_nr',
+            'support_bottom_extruder_nr',
+            'adhesion_extruder_nr',
+            'prime_tower_enable',
+            'ooze_shield_enabled',
+            'carve_multiple_volumes',
+            'retraction_max_count'
         }
 
         old_material_id = Preferences.getInstance().getValue("cura/old_material")
@@ -116,9 +116,9 @@ class PrintModeManager:
 
     def _onPrintModeChanged(self):
         if self._global_stack:
+            self._restoreSettingsValue()
             print_mode = self._global_stack.getProperty("print_mode", "value")
             if print_mode != "regular":
-                self._handleSettingsValue()
                 nodes = self._scene.getRoot().getChildren()
                 for node in nodes:
                     self._setActiveExtruder(node)
@@ -129,7 +129,6 @@ class PrintModeManager:
                     Preferences.getInstance().setValue("cura/old_material", self._old_material.getId())
                 self.renderDuplicatedNodes()
             else:
-                self._restoreSettingsValue()
                 self.removeDuplicatedNodes()
                 if self._old_material != "":
                     ExtruderManager.getInstance().getExtruderStack(1).setMaterial(self._old_material)
@@ -153,8 +152,8 @@ class PrintModeManager:
             self._global_stack.setProperty(key, "value", value)
 
     def _restoreSettingsValue(self):
-        for key in self._conflict_settings.keys():
-            Application.getInstance().getMachineManager().clearUserSettingAllCurrentStacks(key)
+        for setting in self._conflict_settings:
+            Application.getInstance().getMachineManager().clearUserSettingAllCurrentStacks(setting)
 
     @classmethod
     def getInstance(cls) -> "PrintModeManager":

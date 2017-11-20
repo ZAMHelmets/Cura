@@ -776,7 +776,7 @@ class ContainerManager(QObject):
         self._container_registry.addContainer(duplicated_container)
         return self._getMaterialContainerIdForActiveMachine(new_id)
 
-    ##  Create a new material by cloning Generic PLA for the current material diameter and setting the GUID to something unqiue
+    ##  Create a new material by cloning Generic PLA for the current material diameter and setting the GUID to something unique
     #
     #   \return \type{str} the id of the newly created container.
     @pyqtSlot(result = str)
@@ -789,7 +789,7 @@ class ContainerManager(QObject):
             return ""
 
         approximate_diameter = str(round(global_stack.getProperty("material_diameter", "value")))
-        containers = self._container_registry.findInstanceContainers(id = "BCN3D_Filaments_PLA_Pumpkin_Orange", approximate_diameter = approximate_diameter)
+        containers = self._container_registry.findInstanceContainers(id = "BCN3D_Filaments_PLA_White", approximate_diameter = approximate_diameter)
         if not containers:
             Logger.log("d", "Unable to create a new material by cloning Generic PLA, because it cannot be found for the material diameter for this machine.")
             return ""

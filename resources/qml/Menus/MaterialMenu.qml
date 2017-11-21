@@ -46,7 +46,7 @@ Menu
             {
                 if (items[i]["metadata"]["GUID"] == material_id)
                 {
-                    Cura.MachineManager.setActiveMaterial(items[i].id);
+                    Cura.MachineManager.setActiveMaterial(items[i].id, extruderIndex);
                     break;
                 }
             }
@@ -69,7 +69,7 @@ Menu
             exclusiveGroup: group;
             onTriggered:
             {
-                Cura.MachineManager.setActiveMaterial(model.id);
+                Cura.MachineManager.setActiveMaterial(model.id, extruderIndex);
             }
         }
         onObjectAdded: menu.insertItem(index, object)
@@ -107,7 +107,7 @@ Menu
                             exclusiveGroup: group;
                             onTriggered:
                             {
-                                Cura.MachineManager.setActiveMaterial(model.id);
+                                Cura.MachineManager.setActiveMaterial(model.id, extruderIndex);
                             }
                         }
                         onObjectAdded: brandMaterialsMenu.insertItem(index, object)

@@ -126,6 +126,8 @@ class PrintModeManager:
                     self._old_material = ExtruderManager.getInstance().getExtruderStack(1).material
                     material = ExtruderManager.getInstance().getExtruderStack(0).material
                     ExtruderManager.getInstance().getExtruderStack(1).setMaterial(material)
+                    variant = ExtruderManager.getInstance().getExtruderStack(0).variant
+                    ExtruderManager.getInstance().getExtruderStack(1).setVariant(variant)
                     Preferences.getInstance().setValue("cura/old_material", self._old_material.getId())
                 self.renderDuplicatedNodes()
             else:
@@ -136,10 +138,13 @@ class PrintModeManager:
                     Preferences.getInstance().setValue("cura/old_material", "")
 
     def _materialChanged(self, container):
-        if self._global_stack and container.getMetaDataEntry("type") == "material":
-            print_mode = self._global_stack.getProperty("print_mode", "value")
-            if print_mode != "regular":
-                ExtruderManager.getInstance().getExtruderStack(1).setMaterial(container)
+        print_mode = self._global_stack.getProperty("print_mode", "value")
+        if print_mode != "regular":
+            if self._global_stack:
+                if container.getMetaDataEntry("type") == "material":
+                    ExtruderManager.getInstance().getExtruderStack(1).setMaterial(container)
+                elif container.getMetaDataEntry("type") == "variant":
+                    ExtruderManager.getInstance().getExtruderStack(1).setVariant(container)
 
     def _setActiveExtruder(self, node):
         if type(node) == SceneNode:

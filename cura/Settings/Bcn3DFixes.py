@@ -315,6 +315,7 @@ class Bcn3DFixes(Job):
         if self._fixFirstRetract:
             self._startGcodeInfo.append("; - Fix First Extrusion")
             startGcodeCorrected = False
+            usingT1 = False
             eValue = 0
             fixExtruder = "T0"
             for index, layer in enumerate(self._gcode_list):
@@ -331,8 +332,9 @@ class Bcn3DFixes(Job):
                                 if GCodeUtils.charsInLine(["G", "F", "E-"], line):
                                     eValue = GCodeUtils.getValue(line, "E")
                                 lineCount += 1
+                            usingT1 = True
                         # Fix the thing
-                        elif layer.startswith(";LAYER:"):
+                        elif layer.startswith(";LAYER:") and usingT1:
                             line1 = lines[temp_index + 1]
                             line2 = lines[temp_index + 2]
                             line3 = lines[temp_index + 3]

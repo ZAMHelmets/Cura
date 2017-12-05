@@ -51,6 +51,8 @@ class DuplicatedNode(SceneNode):
             self.setPosition(Vector(-node_pos.x, node_pos.y, node_pos.z))
         elif print_mode == "duplication":
             self.setPosition(Vector(node_pos.x + (machine_width/2), node_pos.y, node_pos.z))
+        else:
+            return
 
         if node_pos.x > 0:
             self.node.setPosition(Vector(0, node_pos.y, node_pos.z))

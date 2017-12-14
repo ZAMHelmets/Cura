@@ -401,7 +401,7 @@ class Bcn3DFixes(Job):
                                 countingForTool = 0
                             elif lines[temp_index].startswith("T1"):
                                 countingForTool = 1
-                        elif applyFix and GCodeUtils.charsInLine(["G1", "F", "X", "Y", "E"], lines[temp_index]):
+                        elif applyFix and self._smartPurge[countingForTool] and GCodeUtils.charsInLine(["G1", "F", "X", "Y", "E"], lines[temp_index]):
                             # first extrusion with the new tool found
                             extrudeAgainIndex = temp_index
                             temp_index = toolChangeIndex

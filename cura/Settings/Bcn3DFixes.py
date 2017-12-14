@@ -334,7 +334,7 @@ class Bcn3DFixes(Job):
                                 lineCount += 1
                             usingT1 = True
                         # Fix the thing
-                        elif layer.startswith(";LAYER:") and usingT1:
+                        elif usingT1 and layer.startswith(";LAYER:"):
                             line1 = lines[temp_index + 1]
                             line2 = lines[temp_index + 2]
                             line3 = lines[temp_index + 3]

@@ -179,21 +179,22 @@ class Bcn3DFixes(Job):
             # Scan all temperatures
             temperatures = []  # [(layerIndex, lineIndex, action, line)]
             for index, layer in enumerate(self._gcode_list):
-                lines = layer.split("\n")
-                temp_index = 0
-                while temp_index < len(lines):
-                    line = lines[temp_index]
-                    if layer.startswith(";LAYER:"):
-                        if line.startswith("M109"):
-                            temperatures.append([index, temp_index, "heat", line])
-                        elif line.startswith("T"):
-                            temperatures.append([index, temp_index, "toolChange", line])
-                        elif line.startswith("M104"):
-                            if line.startswith("M104 T"):
-                                temperatures.append([index, temp_index, "preheat", line])
-                            else:
-                                temperatures.append([index, temp_index, "unknown", line])
-                    temp_index += 1
+                if index > 2: # avoid altering layer 0
+                    lines = layer.split("\n")
+                    temp_index = 0
+                    while temp_index < len(lines):
+                        line = lines[temp_index]
+                        if layer.startswith(";LAYER:"):
+                            if line.startswith("M109"):
+                                temperatures.append([index, temp_index, "heat", line])
+                            elif line.startswith("T"):
+                                temperatures.append([index, temp_index, "toolChange", line])
+                            elif line.startswith("M104"):
+                                if line.startswith("M104 T"):
+                                    temperatures.append([index, temp_index, "preheat", line])
+                                else:
+                                    temperatures.append([index, temp_index, "unknown", line])
+                        temp_index += 1
             # Define "unknown" roles
             for elementIndex in range(len(temperatures)):
                 action = temperatures[elementIndex][2]

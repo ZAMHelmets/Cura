@@ -709,19 +709,23 @@ class MachineManager(QObject):
 
     ## Set the active material by switching out a container
     #  Depending on from/to material+current variant, a quality profile is chosen and set.
-    @pyqtSlot(str)
-    def setActiveMaterial(self, material_id: str):
+    @pyqtSlot(str, int)
+    def setActiveMaterial(self, material_id: str, extruder_index=None):
+        if extruder_index is not None:
+            extruder_stack = ExtruderManager.getInstance().getExtruderStack(extruder_index)
+        else:
+            extruder_stack = self._active_container_stack
         with postponeSignals(*self._getContainerChangedSignals(), compress = CompressTechnique.CompressPerParameterValue):
             containers = ContainerRegistry.getInstance().findInstanceContainers(id = material_id)
-            if not containers or not self._active_container_stack:
+            if not containers or not extruder_stack:
                 return
             material_container = containers[0]
 
             Logger.log("d", "Attempting to change the active material to %s", material_id)
 
-            old_material = self._active_container_stack.material
-            old_quality = self._active_container_stack.quality
-            old_quality_changes = self._active_container_stack.qualityChanges
+            old_material = extruder_stack.material
+            old_quality = extruder_stack.quality
+            old_quality_changes = extruder_stack.qualityChanges
             if not old_material:
                 Logger.log("w", "While trying to set the active material, no material was found to replace it.")
                 return
@@ -732,7 +736,7 @@ class MachineManager(QObject):
             self.blurSettings.emit()
             old_material.nameChanged.disconnect(self._onMaterialNameChanged)
 
-            self._active_container_stack.material = material_container
+            extruder_stack.material = material_container
             Logger.log("d", "Active material changed")
 
             material_container.nameChanged.connect(self._onMaterialNameChanged)
@@ -752,7 +756,7 @@ class MachineManager(QObject):
                 new_quality_id = old_quality_changes.getId()
 
             # See if the requested quality type is available in the new situation.
-            machine_definition = self._active_container_stack.getBottom()
+            machine_definition = extruder_stack.getBottom()
             quality_manager = QualityManager.getInstance()
             candidate_quality = None
             if quality_type:

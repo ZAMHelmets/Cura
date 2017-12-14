@@ -11,6 +11,7 @@ from cura.Settings.ExtruderManager import ExtruderManager
 
 class Bcn3DFixes(Job):
     def __init__(self, container, gcode_list):
+        super().__init__()
         self._container = container
         self._gcode_list = gcode_list
         

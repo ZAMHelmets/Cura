@@ -20,7 +20,7 @@ from typing import List
 
 
 class ArrangeObjectsJob(Job):
-    def __init__(self, nodes: List[SceneNode], fixed_nodes: List[SceneNode], min_offset = 8):
+    def __init__(self, nodes: List[SceneNode], fixed_nodes: List[SceneNode], min_offset = 4):
         super().__init__()
         self._nodes = nodes
         self._fixed_nodes = fixed_nodes
@@ -55,7 +55,7 @@ class ArrangeObjectsJob(Job):
                 start_priority = last_priority
             else:
                 start_priority = 0
-            best_spot = arranger.bestSpot(offset_shape_arr, start_prio=start_priority, step=10)
+            best_spot = arranger.bestSpot(offset_shape_arr, start_prio=start_priority, step=1)
             x, y = best_spot.x, best_spot.y
             node.removeDecorator(ZOffsetDecorator)
             if node.getBoundingBox():

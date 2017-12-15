@@ -79,7 +79,7 @@ class CuraActions(QObject):
     @pyqtSlot(int)
     def multiplySelection(self, count: int) -> None:
         nodes = Selection.getAllSelectedObjects()
-        job = MultiplyObjectsJob(nodes, count, 8)
+        job = MultiplyObjectsJob(nodes, count, 4)
         job.start()
 
     ##  Delete all selected objects.

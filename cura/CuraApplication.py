@@ -293,6 +293,7 @@ class CuraApplication(QtApplication):
         preferences.addPreference("view/center_on_select", False)
         preferences.addPreference("mesh/scale_to_fit", False)
         preferences.addPreference("mesh/scale_tiny_meshes", True)
+        preferences.addPreference("mesh/arrange_align", False)
         preferences.addPreference("cura/dialog_on_project_save", True)
         preferences.addPreference("cura/asked_dialog_on_project_save", False)
         preferences.addPreference("cura/choice_on_profile_override", "always_ask")
@@ -921,7 +922,7 @@ class CuraApplication(QtApplication):
     #   \param min_offset minimum offset to other objects.
     @pyqtSlot("quint64", int)
     @deprecated("Use CuraActions::multiplySelection", "2.6")
-    def multiplyObject(self, object_id, count, min_offset = 8):
+    def multiplyObject(self, object_id, count, min_offset = 4):
         node = self.getController().getScene().findObject(object_id)
         if not node:
             node = Selection.getSelectedObject(0)
@@ -1361,7 +1362,7 @@ class CuraApplication(QtApplication):
 
         root = self.getController().getScene().getRoot()
         arranger = Arrange.create(scene_root = root)
-        min_offset = 8
+        min_offset = 4
         self.fileLoaded.emit(filename)
 
         for node in nodes:
@@ -1398,7 +1399,7 @@ class CuraApplication(QtApplication):
                     offset_shape_arr, hull_shape_arr = ShapeArray.fromNode(node, min_offset = min_offset)
 
                     # Step is for skipping tests to make it a lot faster. it also makes the outcome somewhat rougher
-                    node, _ = arranger.findNodePlacement(node, offset_shape_arr, hull_shape_arr, step = 10)
+                    node, _ = arranger.findNodePlacement(node, offset_shape_arr, hull_shape_arr, step = 5)
 
             print_mode_enabled = self.getGlobalContainerStack().getProperty("print_mode", "enabled")
             if print_mode_enabled:

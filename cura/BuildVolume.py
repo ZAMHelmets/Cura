@@ -52,6 +52,8 @@ class BuildVolume(SceneNode):
         self._depth = 0
         self._shape = ""
 
+        self.margin = 0
+
         self._shader = None
 
         self._origin_mesh = None
@@ -651,22 +653,24 @@ class BuildVolume(SceneNode):
                 else:
                     margin = 0
 
+                self.margin = margin
+
                 if print_mode == "mirror":
                     machine_head_with_fans_polygon = self._global_container_stack.getProperty("machine_head_with_fans_polygon", "value")
                     machine_head_size = math.fabs(machine_head_with_fans_polygon[0][0] - machine_head_with_fans_polygon[2][0])
                     area = Polygon([
                         [(-machine_head_size/2) - margin, -self._depth/2],
                         [(-machine_head_size/2) - margin, self._depth/2],
-                        [machine_width, self._depth/2],
-                        [machine_width, -self._depth/2]
+                        [machine_width/2, self._depth/2],
+                        [machine_width/2, -self._depth/2]
                     ])
                     self._disallowed_areas.extend([area])
                 elif print_mode == "duplication":
                     area = Polygon([
                         [-margin, -self._depth / 2],
                         [-margin, self._depth / 2],
-                        [machine_width, self._depth / 2],
-                        [machine_width, -self._depth / 2]
+                        [machine_width/2, self._depth / 2],
+                        [machine_width/2, -self._depth / 2]
                     ])
                     self._disallowed_areas.extend([area])
             else:

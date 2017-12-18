@@ -1,12 +1,15 @@
 from UM.Application import Application
+from UM.Logger import Logger
 from UM.Preferences import Preferences
 from UM.Signal import Signal
 from UM.Scene.SceneNode import SceneNode
 from UM.Operations.AddSceneNodeOperation import AddSceneNodeOperation
 from UM.Operations.RemoveSceneNodeOperation import RemoveSceneNodeOperation
+from UM.Math.Vector import Vector
 
 from cura.DuplicatedNode import DuplicatedNode
 from cura.Settings.ExtruderManager import ExtruderManager
+from cura.ShapeArray import ShapeArray
 
 class PrintModeManager:
 
@@ -120,8 +123,26 @@ class PrintModeManager:
             print_mode = self._global_stack.getProperty("print_mode", "value")
             if print_mode != "regular":
                 nodes = self._scene.getRoot().getChildren()
+                max_offset = 0
+                machine_head_with_fans_polygon = self._global_stack.getProperty("machine_head_with_fans_polygon", "value")
+                machine_head_size = abs(machine_head_with_fans_polygon[0][0] - machine_head_with_fans_polygon[2][0])
+                margin = Application.getInstance().getBuildVolume().margin
+                if print_mode == "mirror":
+                    margin += machine_head_size/2
+                sliceable_nodes = []
                 for node in nodes:
                     self._setActiveExtruder(node)
+                    if node.callDecoration("isSliceable") and not isinstance(node, DuplicatedNode):
+                        sliceable_nodes.append(node)
+                        offset_shape_arr, hull_shape_arr = ShapeArray.fromNode(node, 4)
+                        position = node.getPosition()
+                        max_offset = max(abs(offset_shape_arr.offset_x) + position.x + margin, max_offset)
+
+                for node in sliceable_nodes:
+                    position = node.getPosition()
+                    offset = position.x - max_offset
+                    node.setPosition(Vector(offset, position.y, position.z))
+
                 if self._old_material == "":
                     self._old_material = ExtruderManager.getInstance().getExtruderStack(1).material
                     material = ExtruderManager.getInstance().getExtruderStack(0).material

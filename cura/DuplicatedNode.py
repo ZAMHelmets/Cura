@@ -5,6 +5,7 @@ from UM.Operations.MirrorOperation import MirrorOperation
 from UM.Application import Application
 from UM.Scene.SceneNode import SceneNode
 
+from cura.ShapeArray import ShapeArray
 from cura.Settings.ExtruderManager import ExtruderManager
 from cura.Settings.SetObjectExtruderOperation import SetObjectExtruderOperation
 
@@ -54,10 +55,15 @@ class DuplicatedNode(SceneNode):
         else:
             return
 
-        if node_pos.x > 0:
-            self.node.setPosition(Vector(0, node_pos.y, node_pos.z))
-        elif node_pos.x < -machine_width/2:
-            self.node.setPosition(Vector(-machine_width/2, node_pos.y, node_pos.z))
+        offset_shape_arr, hull_shape_arr = ShapeArray.fromNode(self.node, 4)
+        machine_head_with_fans_polygon = Application.getInstance().getGlobalContainerStack().getProperty("machine_head_with_fans_polygon", "value")
+        machine_head_size = abs(machine_head_with_fans_polygon[0][0] - machine_head_with_fans_polygon[2][0])
+        margin = Application.getInstance().getBuildVolume().margin
+        if print_mode == "mirror":
+            margin += machine_head_size / 2
+
+        if node_pos.x + abs(offset_shape_arr.offset_x) > -margin:
+            self.node.setPosition(Vector(-(margin + abs(offset_shape_arr.offset_x)), node_pos.y, node_pos.z))
 
 
     def _onTransformationChanged(self, node):

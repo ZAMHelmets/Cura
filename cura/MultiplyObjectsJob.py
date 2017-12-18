@@ -25,7 +25,7 @@ from UM.Scene.Selection import Selection
 from UM.Operations.AddSceneNodeOperation import AddSceneNodeOperation
 
 class MultiplyObjectsJob(Job):
-    def __init__(self, objects, count, min_offset = 8):
+    def __init__(self, objects, count, min_offset = 4):
         super().__init__()
         self._objects = objects
         self._count = count

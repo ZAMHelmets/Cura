@@ -324,53 +324,48 @@ class Bcn3DFixes(Job):
             fixExtruder = "T0"
             for index, layer in enumerate(self._gcode_list):
                 lines = layer.split("\n")
-                temp_index = 0
-                while temp_index < len(lines):
-                    # try:
-                        line = lines[temp_index]
-                        # Get retract value before starting the first layer
-                        if not layer.startswith(";LAYER"):
-                            if line.startswith("T1"):
-                                countingForTool = 1
-                            elif line.startswith("T0"):
-                                countingForTool = 0
-                            if GCodeUtils.charsInLine(["G", "F", "E-"], line):
-                                if countingForTool == 0:
-                                    eValueT0 = GCodeUtils.getValue(line, "E")
-                                else:
-                                    eValueT1 = GCodeUtils.getValue(line, "E")
-                        # Fix the thing
-                        elif eValueT1 > 0 and layer.startswith(";LAYER:"):
-                            if 'T1\nG92 E0' in layer and layer.startswith(";LAYER:0"):
-                                if self._both_extruders:
-                                    # Starts with T1,  then T0. Both need to be fixed
-                                    layer.replace('T1\nG92 E0', 'T1\nG92 E'+str(eValueT1)+' ;T1fix', 1)
-                                    if 'T0\nG92 E0' in layer:
-                                        layer.replace('T0\nG92 E0', 'T0\nG92 E'+str(eValueT0)+' ;T0fix', 1)
-                                        startGcodeCorrected = True
+                # Get retract value before starting the first layer
+                if not layer.startswith(";LAYER"):
+                    temp_index = 0
+                    while temp_index < len(lines):
+                        # try:
+                            line = lines[temp_index]
+                                if line.startswith("T1"):
+                                    countingForTool = 1
+                                elif line.startswith("T0"):
+                                    countingForTool = 0
+                                if GCodeUtils.charsInLine(["G", "F", "E-"], line):
+                                    if countingForTool == 0:
+                                        eValueT0 = GCodeUtils.getValue(line, "E")
                                     else:
-                                        lookingForTool = 'T0'
-                                    break
-                                else:
-                                    # Starts with T1 and only T1 need to be fixed
-                                    layer.replace('T1\nG92 E0', 'T1\nG92 E'+str(eValueT1)+' ;T1fix', 1)
-                                    startGcodeCorrected = True
-                                    break
-                            elif lookingForTool == 'T1' and 'T1\nG92 E0' in layer:
-                                layer.replace('T1\nG92 E0', 'T1\nG92 E'+str(eValueT1)+' ;T1fix', 1)
-                                startGcodeCorrected = True
-                                break
-                            elif lookingForTool == 'T0' and 'T0\nG92 E0' in layer:
+                                        eValueT1 = GCodeUtils.getValue(line, "E")
+                            temp_index += 1
+                        # except:
+                        #     break
+                # Fix the thing
+                elif eValueT1 > 0 and layer.startswith(";LAYER:"):
+                    if 'T1\nG92 E0' in layer and layer.startswith(";LAYER:0"):
+                        if self._both_extruders:
+                            # Starts with T1,  then T0. Both need to be fixed
+                            layer.replace('T1\nG92 E0', 'T1\nG92 E'+str(eValueT1)+' ;T1fix', 1)
+                            if 'T0\nG92 E0' in layer:
                                 layer.replace('T0\nG92 E0', 'T0\nG92 E'+str(eValueT0)+' ;T0fix', 1)
                                 startGcodeCorrected = True
-                                break
                             else:
-                                # Starts with T0, T1 will need to be fixed
-                                lookingForTool = 'T1'
-                        temp_index += 1
-                    # except:
-                    #     break
-                layer = "\n".join(lines)
+                                lookingForTool = 'T0'
+                        else:
+                            # Starts with T1 and only T1 need to be fixed
+                            layer.replace('T1\nG92 E0', 'T1\nG92 E'+str(eValueT1)+' ;T1fix', 1)
+                            startGcodeCorrected = True
+                    elif lookingForTool == 'T1' and 'T1\nG92 E0' in layer:
+                        layer.replace('T1\nG92 E0', 'T1\nG92 E'+str(eValueT1)+' ;T1fix', 1)
+                        startGcodeCorrected = True
+                    elif lookingForTool == 'T0' and 'T0\nG92 E0' in layer:
+                        layer.replace('T0\nG92 E0', 'T0\nG92 E'+str(eValueT0)+' ;T0fix', 1)
+                        startGcodeCorrected = True
+                    else:
+                        # Starts with T0, T1 will need to be fixed
+                        lookingForTool = 'T1'
                 self._gcode_list[index] = layer
                 if startGcodeCorrected:
                     break

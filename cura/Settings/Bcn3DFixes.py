@@ -318,6 +318,7 @@ class Bcn3DFixes(Job):
             self._startGcodeInfo.append("; - Fix First Extrusion")
             startGcodeCorrected = False
             lookingForTool = None
+            countingForTool = 0
             eValueT0 = 0
             eValueT1 = 0
             fixExtruder = "T0"
@@ -325,24 +326,19 @@ class Bcn3DFixes(Job):
                 lines = layer.split("\n")
                 temp_index = 0
                 while temp_index < len(lines):
-                    try:
+                    # try:
                         line = lines[temp_index]
                         # Get retract value before starting the first layer
                         if not layer.startswith(";LAYER"):
-                            lineCount = 0
-                            while not lineCount > len(lines) - temp_index:
-                                line = lines[temp_index + lineCount]
+                            if line.startswith("T1"):
+                                countingForTool = 1
+                            elif line.startswith("T0"):
                                 countingForTool = 0
-                                if line.startswith("T1"):
-                                    countingForTool = 1
-                                elif line.startswith("T0"):
-                                    countingForTool = 0
-                                if GCodeUtils.charsInLine(["G", "F", "E-"], line):
-                                    if countingForTool == 0:
-                                        eValueT0 = GCodeUtils.getValue(line, "E")
-                                    else:
-                                        eValueT1 = GCodeUtils.getValue(line, "E")
-                                lineCount += 1
+                            if GCodeUtils.charsInLine(["G", "F", "E-"], line):
+                                if countingForTool == 0:
+                                    eValueT0 = GCodeUtils.getValue(line, "E")
+                                else:
+                                    eValueT1 = GCodeUtils.getValue(line, "E")
                         # Fix the thing
                         elif eValueT1 > 0 and layer.startswith(";LAYER:"):
                             if 'T1\nG92 E0' in layer and layer.startswith(";LAYER:0"):
@@ -372,8 +368,8 @@ class Bcn3DFixes(Job):
                                 # Starts with T0, T1 will need to be fixed
                                 lookingForTool = 'T1'
                         temp_index += 1
-                    except:
-                        break
+                    # except:
+                    #     break
                 layer = "\n".join(lines)
                 self._gcode_list[index] = layer
                 if startGcodeCorrected:

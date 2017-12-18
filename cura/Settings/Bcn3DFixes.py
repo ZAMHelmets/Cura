@@ -325,22 +325,16 @@ class Bcn3DFixes(Job):
                 lines = layer.split("\n")
                 # Get retract value before starting the first layer
                 if not layer.startswith(";LAYER"):
-                    temp_index = 0
-                    while temp_index < len(lines):
-                        # try:
-                            line = lines[temp_index]
-                            if line.startswith("T1"):
-                                countingForTool = 1
-                            elif line.startswith("T0"):
-                                countingForTool = 0
-                            if GCodeUtils.charsInLine(["G", "F", "E-"], line):
-                                if countingForTool == 0:
-                                    eValueT0 = GCodeUtils.getValue(line, "E")
-                                else:
-                                    eValueT1 = GCodeUtils.getValue(line, "E")
-                            temp_index += 1
-                        # except:
-                        #     break
+                    for line in lines:
+                        if line.startswith("T1"):
+                            countingForTool = 1
+                        elif line.startswith("T0"):
+                            countingForTool = 0
+                        if GCodeUtils.charsInLine(["G", "F", "E-"], line):
+                            if countingForTool == 0:
+                                eValueT0 = GCodeUtils.getValue(line, "E")
+                            else:
+                                eValueT1 = GCodeUtils.getValue(line, "E")
                 # Fix the thing
                 elif eValueT1 > 0 and layer.startswith(";LAYER:"):
                     if 'T1\nG92 E0' in layer and layer.startswith(";LAYER:0"):

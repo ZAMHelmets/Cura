@@ -317,8 +317,9 @@ class Bcn3DFixes(Job):
         if self._fixFirstRetract:
             self._startGcodeInfo.append("; - Fix First Extrusion")
             startGcodeCorrected = False
-            usingT1 = False
-            eValue = 0
+            lookingForTool = None
+            eValueT0 = 0
+            eValueT1 = 0
             fixExtruder = "T0"
             for index, layer in enumerate(self._gcode_list):
                 lines = layer.split("\n")
@@ -327,54 +328,49 @@ class Bcn3DFixes(Job):
                     try:
                         line = lines[temp_index]
                         # Get retract value before starting the first layer
-                        if not layer.startswith(";LAYER") and line.startswith("T1"):
+                        if not layer.startswith(";LAYER"):
                             lineCount = 0
-                            while not lineCount > len(lines) - temp_index or lines[temp_index + lineCount].startswith("T0"):
+                            while not lineCount > len(lines) - temp_index:
                                 line = lines[temp_index + lineCount]
+                                countingForTool = 0
+                                if line.startswith("T1"):
+                                    countingForTool = 1
+                                elif line.startswith("T0"):
+                                    countingForTool = 0
                                 if GCodeUtils.charsInLine(["G", "F", "E-"], line):
-                                    eValue = GCodeUtils.getValue(line, "E")
+                                    if countingForTool == 0
+                                        eValueT0 = GCodeUtils.getValue(line, "E")
+                                    else:
+                                        eValueT1 = GCodeUtils.getValue(line, "E")
                                 lineCount += 1
-                            usingT1 = True
                         # Fix the thing
-                        elif usingT1 and layer.startswith(";LAYER:"):
-                            line1 = lines[temp_index + 1]
-                            line2 = lines[temp_index + 2]
-                            line3 = lines[temp_index + 3]
-                            line4 = lines[temp_index + 4]
-                            line5 = lines[temp_index + 5]
-                            # detect first tool printing and remove unintentional retract before T1
-                            if temp_index == 0 and GCodeUtils.charsInLine(["G1 F", "E"], line1) and line2 == "G92 E0" and line4 == "T1" and line5 == "G92 E0":
-                                del lines[temp_index + 1]
-                                del lines[temp_index + 1]
-                                temp_index -= 1
-                                fixExtruder = "T1"
-                            # Add proper prime command to T1
-                            elif fixExtruder == "T0":
-                                lineCount = 0
-                                while not lines[temp_index + lineCount].startswith(";TYPE"):
-                                    line = lines[temp_index + lineCount]
-                                    if GCodeUtils.charsInLine(["G0", "F", "X", "Y"], line):
-                                        primeCommandLine = "G1 F" + self._retractionPrimeSpeed[0] + " E0\nG92 E0 ; T0fix"
-                                        lines[temp_index + lineCount + 1] = lines[temp_index + lineCount + 1] + "\n" + primeCommandLine + "\n"
-                                        if self._both_extruders:
-                                            fixExtruder = "T1"
-                                        else:
-                                            fixExtruder = "none"
-                                        break
-                                    lineCount += 1
-                                temp_index += lineCount
-                            elif fixExtruder == "T1" and line == "T1" and line1 == "G92 E0" and line2 == "G91" and "G1 F" in line3 and line4 == "G90":
-                                lineCount = 6  # According to extruder_start_gcode in Sigma Extruders definitions
-                                while not lines[temp_index + lineCount].startswith(";TYPE"):
-                                    line = lines[temp_index + lineCount]
-                                    if GCodeUtils.charsInLine(["G0", "F", "X", "Y"], line):
-                                        if GCodeUtils.charsInLine(["G1 F", " E"], lines[temp_index + lineCount + 1]):
-                                            del lines[temp_index + lineCount + 1]
-                                        primeCommandLine = "G1 F" + self._retractionPrimeSpeed[1] + " E" + str(abs(eValue)) + "\nG92 E0 ; T1fix"
-                                        lines[temp_index + lineCount + 1] = lines[temp_index + lineCount + 1] + "\n" + primeCommandLine + "\n"
-                                        break
-                                    lineCount += 1
-                            startGcodeCorrected = True
+                        elif eValueT1 > 0 and layer.startswith(";LAYER:"):
+                            if 'T1\nG92 E0' in layer and layer.startswith(";LAYER:0"):
+                                if self._both_extruders:
+                                    # Starts with T1,  then T0. Both need to be fixed
+                                    layer.replace('T1\nG92 E0', 'T1\nG92 E'+str(eValueT1), 1)
+                                    if 'T0\nG92 E0' in layer:
+                                        layer.replace('T0\nG92 E0', 'T0\nG92 E'+str(eValueT0), 1)
+                                        startGcodeCorrected = True
+                                    else:
+                                        lookingForTool = 'T0'
+                                    break
+                                else:
+                                    # Starts with T1 and only T1 need to be fixed
+                                    layer.replace('T1\nG92 E0', 'T1\nG92 E'+str(eValueT1), 1)
+                                    startGcodeCorrected = True
+                                    break
+                            elif lookingForTool == 'T1' and 'T1\nG92 E0' in layer:
+                                layer.replace('T1\nG92 E0', 'T1\nG92 E'+str(eValueT1), 1)
+                                startGcodeCorrected = True
+                                break
+                            elif lookingForTool == 'T0' and 'T0\nG92 E0' in layer:
+                                layer.replace('T0\nG92 E0', 'T0\nG92 E'+str(eValueT0), 1)
+                                startGcodeCorrected = True
+                                break
+                            else:
+                                # Starts with T0, T1 will need to be fixed
+                                lookingForTool = 'T1'
                         temp_index += 1
                     except:
                         break

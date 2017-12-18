@@ -321,7 +321,6 @@ class Bcn3DFixes(Job):
             countingForTool = 0
             eValueT0 = 0
             eValueT1 = 0
-            fixExtruder = "T0"
             for index, layer in enumerate(self._gcode_list):
                 lines = layer.split("\n")
                 # Get retract value before starting the first layer
@@ -330,15 +329,15 @@ class Bcn3DFixes(Job):
                     while temp_index < len(lines):
                         # try:
                             line = lines[temp_index]
-                                if line.startswith("T1"):
-                                    countingForTool = 1
-                                elif line.startswith("T0"):
-                                    countingForTool = 0
-                                if GCodeUtils.charsInLine(["G", "F", "E-"], line):
-                                    if countingForTool == 0:
-                                        eValueT0 = GCodeUtils.getValue(line, "E")
-                                    else:
-                                        eValueT1 = GCodeUtils.getValue(line, "E")
+                            if line.startswith("T1"):
+                                countingForTool = 1
+                            elif line.startswith("T0"):
+                                countingForTool = 0
+                            if GCodeUtils.charsInLine(["G", "F", "E-"], line):
+                                if countingForTool == 0:
+                                    eValueT0 = GCodeUtils.getValue(line, "E")
+                                else:
+                                    eValueT1 = GCodeUtils.getValue(line, "E")
                             temp_index += 1
                         # except:
                         #     break

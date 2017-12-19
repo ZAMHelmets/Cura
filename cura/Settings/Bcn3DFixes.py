@@ -324,7 +324,7 @@ class Bcn3DFixes(Job):
                 if not layer.startswith(";LAYER:"):
                     # Get retract value before starting the first layer
                     for line in lines:
-                         if line.startswith("T1"):
+                        if line.startswith("T1"):
                             countingForTool = 1
                         if countingForTool and GCodeUtils.charsInLine(["G", "F", "E-"], line):
                             eValueT1 = GCodeUtils.getValue(line, "E")

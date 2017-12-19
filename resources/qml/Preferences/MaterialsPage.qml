@@ -140,7 +140,7 @@ UM.ManagementPage
             onClicked:
             {
                 forceActiveFocus();
-                Cura.MachineManager.setActiveMaterial(base.currentItem.id)
+                Cura.MachineManager.setActiveMaterial(base.currentItem.id, base.objectList.currentIndex)
                 currentItem = base.model.getItem(base.objectList.currentIndex) // Refresh the current item.
             }
         },
@@ -158,7 +158,7 @@ UM.ManagementPage
                 }
                 if(Cura.MachineManager.hasMaterials)
                 {
-                    Cura.MachineManager.setActiveMaterial(material_id)
+                    Cura.MachineManager.setActiveMaterial(material_id, base.objectList.currentIndex)
                 }
                 base.objectList.currentIndex = base.getIndexById(material_id);
             }
@@ -180,7 +180,7 @@ UM.ManagementPage
                 }
                 if(Cura.MachineManager.hasMaterials)
                 {
-                    Cura.MachineManager.setActiveMaterial(material_id)
+                    Cura.MachineManager.setActiveMaterial(material_id, base.objectList.currentIndex)
                 }
                 base.objectList.currentIndex = base.getIndexById(material_id);
             }

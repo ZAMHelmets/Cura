@@ -324,8 +324,9 @@ class Bcn3DFixes(Job):
                 if not layer.startswith(";LAYER:"):
                     # Get retract value before starting the first layer
                     for line in lines:
-                        countingForTool = 1 if line.startswith("T1") else None
-                        elif countingForTool and GCodeUtils.charsInLine(["G", "F", "E-"], line):
+                         if line.startswith("T1"):
+                            countingForTool = 1
+                        if countingForTool and GCodeUtils.charsInLine(["G", "F", "E-"], line):
                             eValueT1 = GCodeUtils.getValue(line, "E")
                             break
                 else:
@@ -347,7 +348,7 @@ class Bcn3DFixes(Job):
                     else:
                         # There is no eValue to fix and it's already printing
                         break
-                self._gcode_list[index] = layer
+            self._gcode_list[index] = layer
             Logger.log("d", "fix_retract applied")
 
     def _handleSmartPurge(self):

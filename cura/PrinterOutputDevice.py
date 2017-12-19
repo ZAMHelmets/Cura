@@ -126,15 +126,15 @@ class PrinterOutputDevice(QObject, OutputDevice):
     # Signal to be emitted when some drastic change occurs in the remaining time (not when the time just passes on normally).
     preheatBedRemainingTimeChanged = pyqtSignal()
 
-    @pyqtProperty(QObject, constant=True)
-    def monitorItem(self):
-        # Note that we specifically only check if the monitor component is created.
-        # It could be that it failed to actually create the qml item! If we check if the item was created, it will try to
-        # create the item (and fail) every time.
-        if not self._monitor_component:
-            self._createMonitorViewFromQML()
-
-        return self._monitor_item
+    # @pyqtProperty(QObject, constant=True)
+    # def monitorItem(self):
+    #     # Note that we specifically only check if the monitor component is created.
+    #     # It could be that it failed to actually create the qml item! If we check if the item was created, it will try to
+    #     # create the item (and fail) every time.
+    #     if not self._monitor_component:
+    #         self._createMonitorViewFromQML()
+    #
+    #     return self._monitor_item
 
     @pyqtProperty(QObject, constant=True)
     def controlItem(self):
@@ -162,21 +162,21 @@ class PrinterOutputDevice(QObject, OutputDevice):
             Logger.log("e", "QQmlComponent status %s", self._control_component.status())
             Logger.log("e", "QQmlComponent error string %s", self._control_component.errorString())
 
-    def _createMonitorViewFromQML(self):
-        path = QUrl.fromLocalFile(self._monitor_view_qml_path)
-
-        # Because of garbage collection we need to keep this referenced by python.
-        self._monitor_component = QQmlComponent(Application.getInstance()._engine, path)
-
-        # Check if the context was already requested before (Printer output device might have multiple items in the future)
-        if self._qml_context is None:
-            self._qml_context = QQmlContext(Application.getInstance()._engine.rootContext())
-            self._qml_context.setContextProperty("OutputDevice", self)
-
-        self._monitor_item = self._monitor_component.create(self._qml_context)
-        if self._monitor_item is None:
-            Logger.log("e", "QQmlComponent status %s", self._monitor_component.status())
-            Logger.log("e", "QQmlComponent error string %s", self._monitor_component.errorString())
+    # def _createMonitorViewFromQML(self):
+    #     path = QUrl.fromLocalFile(self._monitor_view_qml_path)
+    #
+    #     # Because of garbage collection we need to keep this referenced by python.
+    #     self._monitor_component = QQmlComponent(Application.getInstance()._engine, path)
+    #
+    #     # Check if the context was already requested before (Printer output device might have multiple items in the future)
+    #     if self._qml_context is None:
+    #         self._qml_context = QQmlContext(Application.getInstance()._engine.rootContext())
+    #         self._qml_context.setContextProperty("OutputDevice", self)
+    #
+    #     self._monitor_item = self._monitor_component.create(self._qml_context)
+    #     if self._monitor_item is None:
+    #         Logger.log("e", "QQmlComponent status %s", self._monitor_component.status())
+    #         Logger.log("e", "QQmlComponent error string %s", self._monitor_component.errorString())
 
     @pyqtProperty(str, notify=printerTypeChanged)
     def printerType(self):

@@ -459,17 +459,17 @@ UM.MainWindow
                 }
             }
 
-            Loader
-            {
-                sourceComponent: Cura.MachineManager.printerOutputDevices.length > 0 ? Cura.MachineManager.printerOutputDevices[0].monitorItem: null
-                visible: base.showPrintMonitor
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenterOffset: - UM.Theme.getSize("sidebar").width / 2
-                anchors.verticalCenterOffset: UM.Theme.getSize("sidebar_header").height / 2
-                property real maximumWidth: viewportOverlay.width
-                property real maximumHeight: viewportOverlay.height
-            }
+//            Loader
+//            {
+//                sourceComponent: Cura.MachineManager.printerOutputDevices.length > 0 ? Cura.MachineManager.printerOutputDevices[0].monitorItem: null
+//                visible: base.showPrintMonitor
+//                anchors.horizontalCenter: parent.horizontalCenter
+//                anchors.verticalCenter: parent.verticalCenter
+//                anchors.horizontalCenterOffset: - UM.Theme.getSize("sidebar").width / 2
+//                anchors.verticalCenterOffset: UM.Theme.getSize("sidebar_header").height / 2
+//                property real maximumWidth: viewportOverlay.width
+//                property real maximumHeight: viewportOverlay.height
+//            }
 
             UM.MessageStack
             {

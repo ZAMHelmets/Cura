@@ -478,14 +478,14 @@ Rectangle
         visible: !monitoringPrint
     }
 
-    MonitorButton
-    {
-        id: monitorButton
-        implicitWidth: base.width
-        implicitHeight: totalHeight
-        anchors.bottom: parent.bottom
-        visible: monitoringPrint
-    }
+//    MonitorButton
+//    {
+//        id: monitorButton
+//        implicitWidth: base.width
+//        implicitHeight: totalHeight
+//        anchors.bottom: parent.bottom
+//        visible: monitoringPrint
+//    }
 
 
     SidebarTooltip

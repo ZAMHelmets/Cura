@@ -52,7 +52,6 @@ class CuraActions(QObject):
     ##  Center all objects in the selection
     @pyqtSlot()
     def centerSelection(self) -> None:
-        operation = GroupedOperation()
         for node in Selection.getAllSelectedObjects():
             current_node = node
             while current_node.getParent() and current_node.getParent().callDecoration("isGroup"):
@@ -69,9 +68,7 @@ class CuraActions(QObject):
                         machine_head_size = math.fabs(machine_head_with_fans_polygon[0][0] - machine_head_with_fans_polygon[2][0])
                         center -= machine_head_size/4
                     vector = Vector(center, 0, 0)
-            center_operation = SetTransformOperation(current_node, vector)
-            operation.addOperation(center_operation)
-        operation.push()
+            node.setPosition(vector)
 
     ##  Multiply all objects in the selection
     #

@@ -316,43 +316,38 @@ class Bcn3DFixes(Job):
     def _handleFixFirstRetract(self):
         if self._fixFirstRetract:
             self._startGcodeInfo.append("; - Fix First Extrusion")
-            startGcodeCorrected = False
             lookingForTool = None
-            countingForTool = 0
-            eValueT0 = 0
-            eValueT1 = 0
+            countingForTool = None
+            eValueT1 = None
             for index, layer in enumerate(self._gcode_list):
                 lines = layer.split("\n")
-                # Get retract value before starting the first layer
-                if not layer.startswith(";LAYER"):
+                if not layer.startswith(";LAYER:"):
+                    # Get retract value before starting the first layer
                     for line in lines:
                         if line.startswith("T1"):
                             countingForTool = 1
-                        elif line.startswith("T0"):
-                            countingForTool = 0
-                        if GCodeUtils.charsInLine(["G", "F", "E-"], line):
-                            if countingForTool == 0:
-                                eValueT0 = GCodeUtils.getValue(line, "E")
-                            else:
-                                eValueT1 = GCodeUtils.getValue(line, "E")
-                # Fix the thing
-                elif eValueT1 != 0 and layer.startswith(";LAYER:"):
-                    if 'T1\nG92 E0' in layer and layer.startswith(";LAYER:0"):
-                        # IDEX Starts with T0, then T1. Only T1 needs to be fixed
-                        # IDEX Starts with T1, then T0. Only T1 needs to be fixed                                
-                        # MEX  Starts with T1 and only T1 needs to be fixed
-                        layer = layer.replace('T1\nG92 E0', 'T1\nG92 E'+str(eValueT1)+' ;T1fix', 1)
-                        startGcodeCorrected = True
-                    elif lookingForTool == 'T1' and 'T1\nG92 E0' in layer:
-                        # Starts with T0, first T1 found and fixed
-                        layer = layer.replace('T1\nG92 E0', 'T1\nG92 E'+str(eValueT1)+' ;T1fix', 1)
-                        startGcodeCorrected = True
-                    elif not lookingForTool:
-                        # Starts with T0, T1 will need to be fixed
-                        lookingForTool = 'T1'
+                        elif countingForTool and GCodeUtils.charsInLine(["G", "F", "E-"], line):
+                            eValueT1 = GCodeUtils.getValue(line, "E")
+                else:
+                    # Fix the thing
+                    if eValueT1:
+                        if 'T1\nG92 E0' in layer and layer.startswith(";LAYER:0"):
+                            # IDEX Starts with T0, then T1. Only T1 needs to be fixed
+                            # IDEX Starts with T1, then T0. Only T1 needs to be fixed                                
+                            # MEX  Starts with T1 and only T1 needs to be fixed
+                            layer = layer.replace('T1\nG92 E0', 'T1\nG92 E'+str(eValueT1)+' ;T1fix', 1)
+                            break
+                        elif lookingForTool == 'T1' and 'T1\nG92 E0' in layer:
+                            # Starts with T0, first T1 found and fixed
+                            layer = layer.replace('T1\nG92 E0', 'T1\nG92 E'+str(eValueT1)+' ;T1fix', 1)
+                            break
+                        elif not lookingForTool:
+                            # Starts with T0, T1 will need to be fixed
+                            lookingForTool = 'T1'
+                    else:
+                        # There is no eValue to fix and it's already printing
+                        break
                 self._gcode_list[index] = layer
-                if startGcodeCorrected:
-                    break
             Logger.log("d", "fix_retract applied")
 
     def _handleSmartPurge(self):

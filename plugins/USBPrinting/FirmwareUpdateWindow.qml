@@ -10,7 +10,7 @@ import UM 1.1 as UM
 UM.Dialog
 {
     id: base;
-
+    flags: Qt.FramelessWindowHint
     width: 500 * Screen.devicePixelRatio;
     minimumWidth: 500 * Screen.devicePixelRatio;
     height: 100 * Screen.devicePixelRatio;
@@ -18,6 +18,9 @@ UM.Dialog
 
     visible: true;
     modality: Qt.ApplicationModal;
+
+    closeOnAccept: false;
+    closeOnReject: false;
 
     title: catalog.i18nc("@title:window","Firmware Update");
 
@@ -68,6 +71,9 @@ UM.Dialog
                         case 4:
                             //: Firmware update status label
                             return catalog.i18nc("@label","Firmware update failed due to missing firmware.")
+                        case 5:
+                            //: Firmware update status label
+                            return catalog.i18nc("@label", "Firmware latest version is already uploaded.")
                         default:
                             //: Firmware update status label
                             return catalog.i18nc("@label", "Unknown error code: %1").arg(manager.errorCode)
@@ -100,6 +106,19 @@ UM.Dialog
 
         UM.I18nCatalog { id: catalog; name: "cura"; }
     }
+
+    onRejected: {
+        if (manager.firmwareUpdateCompleteStatus) {
+            base.visible = false
+        }
+    }
+
+    onAccepted: {
+        if (manager.firmwareUpdateCompleteStatus) {
+            base.visible = false
+        }
+    }
+
 
     rightButtons: [
         Button

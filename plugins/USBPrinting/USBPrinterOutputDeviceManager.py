@@ -102,13 +102,16 @@ class USBPrinterOutputDeviceManager(QObject, OutputDevicePlugin, Extension):
 
     @pyqtSlot(str)
     def updateAllFirmware(self, file_name):
-        if file_name.startswith("file://"):
-            file_name = QUrl(file_name).toLocalFile() # File dialogs prepend the path with file://, which we don't need / want
         if not self._usb_output_devices:
             Message(i18n_catalog.i18nc("@info", "Unable to update firmware because there are no printers connected.")).show()
             return
+        if file_name.startswith("file://"):
+            file_name = QUrl(file_name).toLocalFile() # File dialogs prepend the path with file://, which we don't need / want
 
         for printer_connection in self._usb_output_devices:
+            if self._usb_output_devices[printer_connection].connectionState != ConnectionState.connected:
+                Message(i18n_catalog.i18nc("@info", "Unable to update firmware because printer connection isn't established yet.")).show()
+                return
             self._usb_output_devices[printer_connection].resetFirmwareUpdate()
         self.spawnFirmwareInterface("")
         for printer_connection in self._usb_output_devices:
@@ -119,7 +122,7 @@ class USBPrinterOutputDeviceManager(QObject, OutputDevicePlugin, Extension):
                 self._usb_output_devices[printer_connection].setProgress(100, 100)
                 Logger.log("w", "No firmware found for printer %s called '%s'", printer_connection, file_name)
                 Message(i18n_catalog.i18nc("@info",
-                    "Could not find firmware required for the printer at %s.") % printer_connection).show()
+                                           "Could not find firmware required for the printer at %s.") % printer_connection).show()
                 self._firmware_view.close()
 
                 continue
@@ -145,61 +148,6 @@ class USBPrinterOutputDeviceManager(QObject, OutputDevicePlugin, Extension):
             USBPrinterOutputDeviceManager._instance = cls()
 
         return USBPrinterOutputDeviceManager._instance
-
-    @pyqtSlot(result = str)
-    def getDefaultFirmwareName(self):
-        # Check if there is a valid global container stack
-        global_container_stack = Application.getInstance().getGlobalContainerStack()
-        if not global_container_stack:
-            Logger.log("e", "There is no global container stack. Can not update firmware.")
-            self._firmware_view.close()
-            return ""
-
-        # The bottom of the containerstack is the machine definition
-        machine_id = global_container_stack.getBottom().id
-
-        machine_has_heated_bed = global_container_stack.getProperty("machine_heated_bed", "value")
-
-        if platform.system() == "Linux":
-            baudrate = 115200
-        else:
-            baudrate = 250000
-
-        # NOTE: The keyword used here is the id of the machine. You can find the id of your machine in the *.json file, eg.
-        # https://github.com/Ultimaker/Cura/blob/master/resources/machines/ultimaker_original.json#L2
-        # The *.hex files are stored at a seperate repository:
-        # https://github.com/Ultimaker/cura-binary-data/tree/master/cura/resources/firmware
-        machine_without_extras  = {"bq_witbox"                : "MarlinWitbox.hex",
-                                   "bq_hephestos_2"           : "MarlinHephestos2.hex",
-                                   "ultimaker_original"       : "MarlinUltimaker-{baudrate}.hex",
-                                   "ultimaker_original_plus"  : "MarlinUltimaker-UMOP-{baudrate}.hex",
-                                   "ultimaker_original_dual"  : "MarlinUltimaker-{baudrate}-dual.hex",
-                                   "ultimaker2"               : "MarlinUltimaker2.hex",
-                                   "ultimaker2_go"            : "MarlinUltimaker2go.hex",
-                                   "ultimaker2_plus"          : "MarlinUltimaker2plus.hex",
-                                   "ultimaker2_extended"      : "MarlinUltimaker2extended.hex",
-                                   "ultimaker2_extended_plus" : "MarlinUltimaker2extended-plus.hex",
-                                   }
-        machine_with_heated_bed = {"ultimaker_original"       : "MarlinUltimaker-HBK-{baudrate}.hex",
-                                   "ultimaker_original_dual"  : "MarlinUltimaker-HBK-{baudrate}-dual.hex",
-                                   }
-        ##TODO: Add check for multiple extruders
-        hex_file = None
-        if machine_id in machine_without_extras.keys():  # The machine needs to be defined here!
-            if machine_id in machine_with_heated_bed.keys() and machine_has_heated_bed:
-                Logger.log("d", "Choosing firmware with heated bed enabled for machine %s.", machine_id)
-                hex_file = machine_with_heated_bed[machine_id]  # Return firmware with heated bed enabled
-            else:
-                Logger.log("d", "Choosing basic firmware for machine %s.", machine_id)
-                hex_file = machine_without_extras[machine_id]  # Return "basic" firmware
-        else:
-            Logger.log("w", "There is no firmware for machine %s.", machine_id)
-
-        if hex_file:
-            return Resources.getPath(CuraApplication.ResourceTypes.Firmware, hex_file.format(baudrate=baudrate))
-        else:
-            Logger.log("w", "Could not find any firmware for machine %s.", machine_id)
-            return ""
 
     ##  Helper to identify serial ports (and scan for them)
     def _addRemovePorts(self, serial_ports):
@@ -231,13 +179,13 @@ class USBPrinterOutputDeviceManager(QObject, OutputDevicePlugin, Extension):
     ##  If one of the states of the connected devices change, we might need to add / remove them from the global list.
     def _onConnectionStateChanged(self, serial_port):
         try:
-            if self._usb_output_devices[serial_port].connectionState == ConnectionState.connected:
+            if self._usb_output_devices[serial_port].connectionState in [ConnectionState.connected, ConnectionState.connecting]:
                 self.getOutputDeviceManager().addOutputDevice(self._usb_output_devices[serial_port])
             else:
                 self.getOutputDeviceManager().removeOutputDevice(serial_port)
             self.connectionStateChanged.emit()
         except KeyError:
-            Logger.log("w", "Connection state of %s changed, but it was not found in the list")
+            Logger.log("w", "Connection state of %s changed, but it was not found in the list", serial_port)
 
     @pyqtProperty(QObject , notify = connectionStateChanged)
     def connectedPrinterList(self):

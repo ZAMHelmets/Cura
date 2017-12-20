@@ -55,6 +55,8 @@ class Bcn3DFixes(Job):
                                           extruder_right.getProperty("material_print_temperature", "value")]
         self._materialStandByTemperature = [extruder_left.getProperty("material_standby_temperature", "value"),
                                                  extruder_right.getProperty("material_standby_temperature", "value")]
+        self._materialFlowDependentTemperature = [extruder_left.getProperty("material_flow_dependent_temperature", "value"),
+                                                 extruder_right.getProperty("material_flow_dependent_temperature", "value")]
 
         #Speeds
         self._travelSpeed = [str(int(extruder_left.getProperty("speed_travel", "value") * 60)),
@@ -160,12 +162,12 @@ class Bcn3DFixes(Job):
                                 break
                         except:
                             pass
-                    if self._idle_extruder != "T0":
+                    if self._idle_extruder == "T1":
                         if "T1" in line:
                             del lines[temp_index]
                             temp_index -= 1
-                    elif self._idle_extruder != "T1":
-                        if (line.startswith("M104 S") or line.startswith("M109 S")) and "T1" not in line:
+                    elif self._idle_extruder == "T0":
+                        if index < 2 and (line.startswith("M104 S") or line.startswith("M109 S")) and "T1" not in line:
                             del lines[temp_index]
                             temp_index -= 1
                     temp_index += 1
@@ -174,27 +176,27 @@ class Bcn3DFixes(Job):
             Logger.log("d", "active_extruders applied")
     
     def _handleFixTemperatureOscilation(self):
-        if self._fixTemperatureOscilation and self._both_extruders:
+        if self._fixTemperatureOscilation and self._both_extruders and (self._materialFlowDependentTemperature[0] or self._materialFlowDependentTemperature[1]):
             self._startGcodeInfo.append("; - Fix Temperature Oscilation")
             # Scan all temperatures
             temperatures = []  # [(layerIndex, lineIndex, action, line)]
             for index, layer in enumerate(self._gcode_list):
-                if index > 2: # avoid altering layer 0
-                    lines = layer.split("\n")
-                    temp_index = 0
-                    while temp_index < len(lines):
-                        line = lines[temp_index]
-                        if layer.startswith(";LAYER:"):
-                            if line.startswith("M109"):
-                                temperatures.append([index, temp_index, "heat", line])
-                            elif line.startswith("T"):
-                                temperatures.append([index, temp_index, "toolChange", line])
-                            elif line.startswith("M104"):
-                                if line.startswith("M104 T"):
-                                    temperatures.append([index, temp_index, "preheat", line])
-                                else:
-                                    temperatures.append([index, temp_index, "unknown", line])
-                        temp_index += 1
+                # if index > 2: # avoid altering layer 0
+                lines = layer.split("\n")
+                temp_index = 0
+                while temp_index < len(lines):
+                    line = lines[temp_index]
+                    if layer.startswith(";LAYER:"):
+                        if line.startswith("M109"):
+                            temperatures.append([index, temp_index, "heat", line])
+                        elif line.startswith("T"):
+                            temperatures.append([index, temp_index, "toolChange", line])
+                        elif line.startswith("M104"):
+                            if line.startswith("M104 T"):
+                                temperatures.append([index, temp_index, "preheat", line])
+                            else:
+                                temperatures.append([index, temp_index, "unknown", line])
+                    temp_index += 1
             # Define "unknown" roles
             for elementIndex in range(len(temperatures)):
                 action = temperatures[elementIndex][2]

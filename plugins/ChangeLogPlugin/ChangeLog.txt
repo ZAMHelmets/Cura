@@ -1,6 +1,19 @@
+[1.1.0]
+*Upgrade to latest firmware version (internet connection required).
+*Upload custom firmware.
+*New parameter to set minimum time to cool down to standby temperature.
+*New arranging strategy that aligns the models.
+*Bug fixes
+Creating new materials works as expected.
+Multiplying works as expected when duplication/mirror mode is enabled.
+Smart Purge is set correctly per extruder.
+First extrusion fixed in special cases.
+Now slice doesn't show errors when using duplication/mirror and 1.00mm Hotend.
+Centering models doesn't rotate them.
 [1.0.3]
-*New parameters to improve Smart Purge control
-*New icon color
+*New parameters to improve Smart Purge control.
+*New icon color.
+*New logo.
 *Bug fixes
 Now Smart Purge works as expected.
 Config files won't create conflicts with older versions.
@@ -11,7 +24,7 @@ No layers missing in dual extrusion prints.
 Smart Purge and Prevent Grinding Filament settable per extruder.
 Keep Print Mode when switching profiles.
 [1.0.1]
-*Reset camera position
+*Reset camera position.
 New view mode to reset the camera position.
 *Bug fixes
 When printing raft now starts extruding the right amount.

@@ -132,7 +132,7 @@ class PrintModeManager:
                 sliceable_nodes = []
                 for node in nodes:
                     self._setActiveExtruder(node)
-                    if node.callDecoration("isSliceable") and not isinstance(node, DuplicatedNode):
+                    if (node.callDecoration("isSliceable") or node.callDecoration("isGroup") ) and not isinstance(node, DuplicatedNode):
                         sliceable_nodes.append(node)
                         offset_shape_arr, hull_shape_arr = ShapeArray.fromNode(node, 4)
                         position = node.getPosition()

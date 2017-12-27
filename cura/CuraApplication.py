@@ -1212,9 +1212,10 @@ class CuraApplication(QtApplication):
         print_mode_enabled = self.getGlobalContainerStack().getProperty("print_mode", "enabled")
         if print_mode_enabled:
             print_mode = self.getGlobalContainerStack().getProperty("print_mode", "value")
-            duplicated_group_node = DuplicatedNode(group_node)
             if print_mode != "regular":
-                duplicated_group_node.setParent(self.getController().getScene().getRoot())
+                duplicated_group_node = DuplicatedNode(group_node, self.getController().getScene().getRoot())
+            else:
+                duplicated_group_node = DuplicatedNode(group_node)
 
         op = GroupedOperation()
         for node in Selection.getAllSelectedObjects():

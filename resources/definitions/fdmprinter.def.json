@@ -285,17 +285,6 @@
                     "settable_per_mesh": false,
                     "settable_per_extruder": true
                 },
-                "machine_min_cool_heat_time_window":
-                {
-                    "label": "Minimal Time Standby Temperature",
-                    "description": "The minimal time an extruder has to be inactive before the nozzle is cooled. Only when an extruder is not used for longer than this time will it be allowed to cool down to the standby temperature.",
-                    "default_value": 50.0,
-                    "unit": "s",
-                    "type": "float",
-                    "enabled": "machine_nozzle_temp_enabled",
-                    "settable_per_mesh": false,
-                    "settable_per_extruder": true
-                },
                 "machine_gcode_flavor":
                 {
                     "label": "Gcode flavour",
@@ -925,7 +914,6 @@
                     "default_value": 0.2,
                     "value": "machine_nozzle_size / 2",
                     "minimum_value": "0",
-                    "maximum_value_warning": "machine_nozzle_size * 2",
                     "limit_to_extruder": "wall_0_extruder_nr",
                     "settable_per_mesh": true
                 },
@@ -1933,6 +1921,17 @@
                     "minimum_value_warning": "0",
                     "maximum_value_warning": "260",
                     "enabled": "machine_extruder_count > 1 and machine_nozzle_temp_enabled and print_mode == 'regular'",
+                    "settable_per_mesh": false,
+                    "settable_per_extruder": true
+                },
+                "machine_min_cool_heat_time_window":
+                {
+                    "label": "Minimal Time Standby Temperature",
+                    "description": "The minimal time an extruder has to be inactive before the nozzle is cooled. Only when an extruder is not used for longer than this time will it be allowed to cool down to the standby temperature.",
+                    "default_value": 50.0,
+                    "unit": "s",
+                    "type": "float",
+                    "enabled": "machine_nozzle_temp_enabled",
                     "settable_per_mesh": false,
                     "settable_per_extruder": true
                 },
@@ -4558,7 +4557,6 @@
                     "minimum_value": "0",
                     "maximum_value": "min(0.5 * machine_width, 0.5 * machine_depth)",
                     "minimum_value_warning": "max(extruderValues('prime_tower_line_width')) * 2",
-                    "maximum_value_warning": "20",
                     "settable_per_mesh": false,
                     "settable_per_extruder": false
                 },

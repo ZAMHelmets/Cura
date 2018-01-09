@@ -134,46 +134,87 @@ class Bcn3DFixes(Job):
 
     def _handleActiveExtruders(self):
         if self._activeExtruders and not self._both_extruders:
-            self._startGcodeInfo.append("; - Heat only essentials")
-            startGcodeCorrected = False
-            for index, layer in enumerate(self._gcode_list):
-                lines = layer.split("\n")
-                temp_index = 0
-                while temp_index < len(lines):
-                    line = lines[temp_index]
-                    if not startGcodeCorrected:
-                        try:
-                            if line.startswith("M108 P1"):
+            if not self._both_extruders:
+                self._startGcodeInfo.append("; - Heat only essentials")
+                startGcodeCorrected = False
+                for index, layer in enumerate(self._gcode_list):
+                    lines = layer.split("\n")
+                    temp_index = 0
+                    while temp_index < len(lines):
+                        line = lines[temp_index]
+                        if not startGcodeCorrected:
+                            try:
+                                if line.startswith("M108 P1"):
+                                    del lines[temp_index]
+                                    temp_index -= 1
+                                line1 = lines[temp_index + 1]
+                                line2 = lines[temp_index + 2]
+                                line3 = lines[temp_index + 3]
+                                line4 = lines[temp_index + 4]
+                                line5 = lines[temp_index + 5]
+                                if line.startswith(self._idle_extruder) and line1.startswith("G92 E0") and line2.startswith("G1 E") and line3.startswith("G92 E0") and line4.startswith("G4 P2000") and line5.startswith("G1 F2400 E-8"):
+                                    del lines[temp_index]
+                                    del lines[temp_index]
+                                    del lines[temp_index]
+                                    del lines[temp_index]
+                                    del lines[temp_index]
+                                    del lines[temp_index]
+                                    startGcodeCorrected = True
+                                    break
+                            except:
+                                pass
+                        if self._idle_extruder == "T1":
+                            if "T1" in line:
                                 del lines[temp_index]
                                 temp_index -= 1
-                            line1 = lines[temp_index + 1]
-                            line2 = lines[temp_index + 2]
-                            line3 = lines[temp_index + 3]
-                            line4 = lines[temp_index + 4]
-                            line5 = lines[temp_index + 5]
-                            if line.startswith(self._idle_extruder) and line1.startswith("G92 E0") and line2.startswith("G1 E") and line3.startswith("G92 E0") and line4.startswith("G4 P2000") and line5.startswith("G1 F2400 E-8"):
+                        elif self._idle_extruder == "T0":
+                            if index < 2 and (line.startswith("M104 S") or line.startswith("M109 S")) and "T1" not in line:
                                 del lines[temp_index]
+                                temp_index -= 1
+                        temp_index += 1
+                    layer = "\n".join(lines)
+                    self._gcode_list[index] = layer
+                Logger.log("d", "active_extruders applied")
+            elif self._both_extruders and container.getProperty("active_extruders", "enabled"):
+                self._startGcodeInfo.append("; - Heat only essentials")
+                startGcodeCorrected = False
+                for index, layer in enumerate(self._gcode_list):
+                    lines = layer.split("\n")
+                    temp_index = 0
+                    while temp_index < len(lines):
+                        line = lines[temp_index]
+                        if not startGcodeCorrected:
+                            try:
+                                line1 = lines[temp_index + 1]
+                                line2 = lines[temp_index + 2]
+                                line3 = lines[temp_index + 3]
+                                line4 = lines[temp_index + 4]
+                                line5 = lines[temp_index + 5]
+                                if line.startswith("T1") and line1.startswith("G92 E0") and line2.startswith("G1 E") and line3.startswith("G92 E0") and line4.startswith("G4 P2000") and line5.startswith("G1 F2400 E-8"):
+                                    del lines[temp_index]
+                                    del lines[temp_index]
+                                    del lines[temp_index]
+                                    del lines[temp_index]
+                                    del lines[temp_index]
+                                    del lines[temp_index]
+                                    lines[temp_index] = lines[temp_index]+"M605 S4      ;Clone extruders steps\n"
+                                    lines[temp_index + 5] = lines[temp_index + 5]+"M605 S3      ;Back to independent extruder steps\n"
+                                    startGcodeCorrected = True
+                                    break
+                            except:
+                                pass
+                        if self._idle_extruder == "T1":
+                            if "T1" in line:
                                 del lines[temp_index]
+                                temp_index -= 1
+                        elif self._idle_extruder == "T0":
+                            if index < 2 and (line.startswith("M104 S") or line.startswith("M109 S")) and "T1" not in line:
                                 del lines[temp_index]
-                                del lines[temp_index]
-                                del lines[temp_index]
-                                del lines[temp_index]
-                                startGcodeCorrected = True
-                                break
-                        except:
-                            pass
-                    if self._idle_extruder == "T1":
-                        if "T1" in line:
-                            del lines[temp_index]
-                            temp_index -= 1
-                    elif self._idle_extruder == "T0":
-                        if index < 2 and (line.startswith("M104 S") or line.startswith("M109 S")) and "T1" not in line:
-                            del lines[temp_index]
-                            temp_index -= 1
-                    temp_index += 1
-                layer = "\n".join(lines)
-                self._gcode_list[index] = layer
-            Logger.log("d", "active_extruders applied")
+                                temp_index -= 1
+                        temp_index += 1
+                    layer = "\n".join(lines)
+                    self._gcode_list[index] = layer
+                Logger.log("d", "active_extruders applied")
     
     def _handleFixTemperatureOscilation(self):
         if self._fixTemperatureOscilation and self._both_extruders and (self._materialFlowDependentTemperature[0] or self._materialFlowDependentTemperature[1]):
